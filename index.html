@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ht">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NENE TOP UP - Rechaje Rapid</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Manrope:wght@500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="shell">
+    <section class="brand-panel" aria-labelledby="page-title">
+      <div class="brand-mark">NT</div>
+      <p class="eyebrow">Free Fire Diamond Top Up</p>
+      <h1 id="page-title">NENE TOP UP</h1>
+      <p class="lead">Rechaje kont Free Fire ou rapid apre peman Natcash la fin verifye.</p>
+
+      <div class="quick-stats" aria-label="Rezime sèvis la">
+        <div>
+          <span>4</span>
+          <p>Pakè dyaman</p>
+        </div>
+        <div>
+          <span>24/7</span>
+          <p>Demann ouvè</p>
+        </div>
+        <div>
+          <span>41591807</span>
+          <p>Natcash</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="form-panel" aria-label="Fòm rechaj dyaman">
+      <div class="panel-heading">
+        <p class="step-label">Demann rechaj</p>
+        <p class="secure-copy">Verifye ID yo avan ou voye demann lan.</p>
+      </div>
+
+      <form id="topUpForm" novalidate>
+        <label for="playerId">ID jwè a</label>
+        <input type="text" id="playerId" name="playerId" inputmode="numeric" autocomplete="off" placeholder="Egz: 123456789" required>
+
+        <label for="diamondAmount">Kantite dyaman</label>
+        <select id="diamondAmount" name="diamondAmount" required>
+          <option value="100">100 Dyaman</option>
+          <option value="310">310 Dyaman</option>
+          <option value="520">520 Dyaman</option>
+          <option value="1060">1060 Dyaman</option>
+        </select>
+
+        <div class="payment-info">
+          <span>NATCASH PEMAN</span>
+          <strong>41591807</strong>
+          <button class="copy-button" type="button" data-copy="41591807">Kopi</button>
+        </div>
+
+        <label for="transactionId">ID tranzaksyon Natcash</label>
+        <input type="text" id="transactionId" name="transactionId" autocomplete="off" placeholder="Egz: NC123456789" required>
+
+        <button type="submit" class="btn-submit">
+          <span class="button-text">Valide Peman & Voye Dyaman</span>
+        </button>
+      </form>
+
+      <div class="status-message" id="statusMessage" role="status" aria-live="polite">
+        Sistèm nan pare pou resevwa demann peman.
+      </div>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
