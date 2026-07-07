@@ -1,76 +1,178 @@
 <!DOCTYPE html>
-<html lang="ht">
+<html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NENE TOP UP - Rechaje Rapid</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Manrope:wght@500;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NENE ENTREPRENEUR</title>
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,Helvetica,sans-serif;
+}
+
+body{
+background:linear-gradient(135deg,#0f172a,#1e3a8a);
+display:flex;
+justify-content:center;
+align-items:center;
+min-height:100vh;
+padding:20px;
+}
+
+.card{
+width:360px;
+background:#fff;
+border-radius:20px;
+padding:25px;
+box-shadow:0 15px 35px rgba(0,0,0,.3);
+text-align:center;
+}
+
+.logo{
+width:90px;
+height:90px;
+background:#1e3a8a;
+color:#fff;
+font-size:40px;
+font-weight:bold;
+display:flex;
+align-items:center;
+justify-content:center;
+margin:auto;
+border-radius:50%;
+}
+
+h1{
+margin-top:15px;
+color:#1e3a8a;
+font-size:28px;
+}
+
+.subtitle{
+margin-top:8px;
+color:#555;
+}
+
+.price{
+margin-top:20px;
+background:#16a34a;
+color:white;
+padding:12px;
+border-radius:10px;
+font-size:22px;
+font-weight:bold;
+}
+
+.pay{
+margin-top:20px;
+background:#f8fafc;
+padding:15px;
+border-radius:10px;
+}
+
+.pay h3{
+color:#1e3a8a;
+}
+
+.number{
+margin-top:10px;
+font-size:28px;
+font-weight:bold;
+color:#dc2626;
+}
+
+.info{
+margin-top:20px;
+text-align:left;
+}
+
+.info h2{
+color:#1e3a8a;
+margin-bottom:10px;
+}
+
+.info ul{
+padding-left:20px;
+}
+
+.info li{
+margin:10px 0;
+font-size:16px;
+}
+
+button{
+margin-top:25px;
+width:100%;
+padding:15px;
+background:#1e3a8a;
+color:white;
+border:none;
+border-radius:10px;
+font-size:18px;
+cursor:pointer;
+transition:.3s;
+}
+
+button:hover{
+background:#2563eb;
+}
+
+.footer{
+margin-top:20px;
+font-size:13px;
+color:#666;
+}
+</style>
+
+<link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-  <main class="shell">
-    <section class="brand-panel" aria-labelledby="page-title">
-      <div class="brand-mark">NT</div>
-      <p class="eyebrow">Free Fire Diamond Top Up</p>
-      <h1 id="page-title">NENE TOP UP</h1>
-      <p class="lead">Rechaje kont Free Fire ou rapid apre peman Natcash la fin verifye.</p>
 
-      <div class="quick-stats" aria-label="Rezime sèvis la">
-        <div>
-          <span>4</span>
-          <p>Pakè dyaman</p>
-        </div>
-        <div>
-          <span>24/7</span>
-          <p>Demann ouvè</p>
-        </div>
-        <div>
-          <span>41591807</span>
-          <p>Natcash</p>
-        </div>
-      </div>
-    </section>
+<div class="card">
 
-    <section class="form-panel" aria-label="Fòm rechaj dyaman">
-      <div class="panel-heading">
-        <p class="step-label">Demann rechaj</p>
-        <p class="secure-copy">Verifye ID yo avan ou voye demann lan.</p>
-      </div>
+<div class="logo">N</div>
 
-      <form id="topUpForm" novalidate>
-        <label for="playerId">ID jwè a</label>
-        <input type="text" id="playerId" name="playerId" inputmode="numeric" autocomplete="off" placeholder="Egz: 123456789" required>
+<h1>NENE ENTREPRENEUR</h1>
 
-        <label for="diamondAmount">Kantite dyaman</label>
-        <select id="diamondAmount" name="diamondAmount" required>
-          <option value="100">100 Dyaman</option>
-          <option value="310">310 Dyaman</option>
-          <option value="520">520 Dyaman</option>
-          <option value="1060">1060 Dyaman</option>
-        </select>
+<p class="subtitle">
+Rejoignez notre plateforme et développez vos compétences.
+</p>
 
-        <div class="payment-info">
-          <span>NATCASH PEMAN</span>
-          <strong>41591807</strong>
-          <button class="copy-button" type="button" data-copy="41591807">Kopi</button>
-        </div>
+<div class="price">
+Inscription : 1 000 GDES
+</div>
 
-        <label for="transactionId">ID tranzaksyon Natcash</label>
-        <input type="text" id="transactionId" name="transactionId" autocomplete="off" placeholder="Egz: NC123456789" required>
+<div class="pay">
+<h3>Paiement via NatCash</h3>
+<div class="number">41591807</div>
+</div>
 
-        <button type="submit" class="btn-submit">
-          <span class="button-text">Valide Peman & Voye Dyaman</span>
-        </button>
-      </form>
+<div class="info">
+<h2>Après votre paiement :</h2>
 
-      <div class="status-message" id="statusMessage" role="status" aria-live="polite">
-        Sistèm nan pare pou resevwa demann peman.
-      </div>
-    </section>
-  </main>
+<ul>
+<li>✔ Vous devenez membre de la plateforme.</li>
+<li>✔ Accès gratuit aux formations.</li>
+<li>✔ Formation Création de Carte Débit.</li>
+<li>✔ Formation Entrepreneuriat.</li>
+</ul>
 
-  <script src="script.js"></script>
+</div>
+
+<button onclick="alert('Merci pour votre inscription !')">
+JE M'INSCRIS
+</button>
+
+<div class="footer">
+© 2026 NENE ENTREPRENEUR
+</div>
+
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>
