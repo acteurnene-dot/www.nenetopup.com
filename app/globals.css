@@ -62,3 +62,21 @@ footer { margin-top: 2rem; padding: 3rem 1rem; border-top: 1px solid var(--line)
 .screenshot-preview strong { color: var(--foreground); font-size: .74rem; }
 .screenshot-preview span { color: var(--muted); font-size: .68rem; }
 @media (max-width: 600px) { .payment-options { grid-template-columns: 1fr; } }
+.auth-page { min-height: 100vh; display: grid; place-items: center; padding: 2rem 1rem; background: radial-gradient(circle at 50% 0%, #171638 0, var(--background) 34rem); }
+.auth-card { width: min(100%, 430px); padding: clamp(1.5rem, 5vw, 2.5rem); border: 1px solid var(--line); border-radius: 22px; background: #101827f2; box-shadow: 0 24px 80px #0006; }
+.auth-card .brand { display: inline-block; margin-bottom: 2.6rem; }
+.auth-card .eyebrow { margin: 0 0 .9rem; }
+.auth-card h1 { font-size: clamp(2.5rem, 10vw, 3.8rem); }
+.auth-copy { margin: 1rem 0 1.6rem; color: var(--muted); line-height: 1.6; }
+.google-button { width: 100%; display: flex; align-items: center; justify-content: center; gap: .7rem; min-height: 50px; padding: .8rem 1rem; border: 1px solid #475569; border-radius: 10px; color: var(--foreground); background: #172238; font-weight: 700; transition: border-color .2s, background .2s; }
+.google-button:hover { border-color: #94a3b8; background: #1d2a42; }
+.google-mark { display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; color: #4285f4; background: #f8fafc; font-family: Arial, sans-serif; font-size: .95rem; font-weight: 900; }
+.auth-divider { display: flex; align-items: center; gap: .75rem; margin: 1.35rem 0; color: #64748b; font-size: .72rem; text-transform: uppercase; letter-spacing: .12em; }
+.auth-divider::before, .auth-divider::after { content: ''; height: 1px; flex: 1; background: var(--line); }
+.auth-card form { display: grid; gap: 1rem; }
+.auth-card label { display: grid; gap: .45rem; color: #cbd5e1; font-size: .78rem; font-weight: 700; }
+.auth-card input { width: 100%; min-height: 48px; padding: .75rem; border: 1px solid #334155; border-radius: 9px; outline: none; color: var(--foreground); background: #0b1220; }
+.auth-card input:focus { border-color: var(--violet); box-shadow: 0 0 0 3px #8b5cf633; }
+.auth-card form .checkout { min-height: 48px; margin-top: .25rem; }
+.auth-switch { width: 100%; margin-top: 1.2rem; padding: .5rem; border: 0; color: #a78bfa; background: transparent; font-size: .8rem; }
+.auth-switch:hover { color: #c4b5fd; text-decoration: underline; }
