@@ -1,0 +1,4 @@
+import { redirect } from 'next/navigation'
+import { createClient } from '@/lib/supabase/server'
+
+export default async function AccountPage() { const supabase = await createClient(); const { data: { user } } = await supabase.auth.getUser(); if (!user) redirect('/login'); return <main className="auth-page"><div className="auth-card"><a className="brand" href="/">NENE STORE <span>ET CELESTE COMPANY</span></a><p className="eyebrow">ESPACE KLIYAN</p><h1>Kont mwen.</h1><p className="auth-copy">Ou konekte ak <strong>{user.email}</strong>.</p><div className="account-box"><strong>Listwa kòmand</strong><p>Kòmand ou yo ap parèt isit la apre yo fin konfime peman yo.</p></div><form action="/auth/signout" method="post"><button className="clear" type="submit">Dekonekte</button></form><a className="auth-switch" href="/">Retounen nan magazen an</a></div></main> }
