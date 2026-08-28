@@ -37,11 +37,16 @@ export default function InstallPrompt() {
   return (
     <div className="install-wrap">
       <button className="install-button" onClick={handleInstall} aria-expanded={showHelp}>
-        Enstale app la
+        <span className="install-icon" aria-hidden="true">↓</span>
+        <span className="install-copy">
+          <strong>Enstale NENE Store</strong>
+          <small>Ajoute l sou telefòn ou</small>
+        </span>
+        <span className="install-arrow" aria-hidden="true">→</span>
       </button>
       {showHelp && !installEvent && (
         <div className="install-help" role="status">
-          <strong>Sou telefòn ou</strong>
+          <strong>Kijan pou enstale</strong>
           <span>Android: ouvri meni navigatè a epi chwazi “Add to Home screen”. iPhone: peze Share, apre sa “Add to Home Screen”.</span>
         </div>
       )}
