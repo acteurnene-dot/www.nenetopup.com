@@ -1,39 +1,40 @@
+const CONFIGURATION = "Enskripsyon NENE Entrepreneur";
+const AMOUNT = "1000 GDES";
+
 export default async (request) => {
   if (request.method !== "POST") {
     return Response.json(
       { success: false, message: "Metòd sa a pa sipòte." },
-      { status: 405 },
+      { status: 405, headers: { Allow: "POST" } },
     );
   }
 
   try {
-    const { playerId, diamondAmount, transactionId } = await request.json();
-    const validAmounts = new Set(["100", "310", "520", "1060"]);
+    const body = await request.json();
+    const fullName = String(body.fullName || "").trim();
+    const phone = String(body.phone || "").trim();
+    const transactionId = String(body.transactionId || "").trim();
+    const configuration = String(body.configuration || "").trim();
+    const amount = String(body.amount || "").trim();
 
-    if (!/^\d{6,15}$/.test(String(playerId || ""))) {
-      return Response.json(
-        { success: false, message: "ID jwè a pa valab." },
-        { status: 400 },
-      );
+    if (fullName.length < 2 || fullName.length > 80) {
+      return Response.json({ success: false, message: "Tanpri mete non konplè ou." }, { status: 400 });
     }
-
-    if (!validAmounts.has(String(diamondAmount))) {
-      return Response.json(
-        { success: false, message: "Pakè dyaman sa a pa disponib." },
-        { status: 400 },
-      );
+    if (!/^\+?[0-9\s-]{8,18}$/.test(phone)) {
+      return Response.json({ success: false, message: "Nimewo telefòn nan pa valab." }, { status: 400 });
     }
-
-    if (!/^[a-zA-Z0-9-]{6,32}$/.test(String(transactionId || ""))) {
-      return Response.json(
-        { success: false, message: "ID tranzaksyon an pa valab." },
-        { status: 400 },
-      );
+    if (configuration !== CONFIGURATION || amount !== AMOUNT) {
+      return Response.json({ success: false, message: "Konfigurasyon oswa pri a pa valab." }, { status: 400 });
+    }
+    if (!/^[a-zA-Z0-9-]{6,32}$/.test(transactionId)) {
+      return Response.json({ success: false, message: "ID tranzaksyon an pa valab." }, { status: 400 });
     }
 
     return Response.json({
       success: true,
-      message: `Demann lan anrejistre. Lè API Natcash ak founisè top-up la konekte, ${diamondAmount} dyaman yo ap ale sou ID ${playerId}.`,
+      message: "ID tranzaksyon an resevwa. WhatsApp ka ouvri pou voye detay yo.",
+      configuration: CONFIGURATION,
+      amount: AMOUNT,
     });
   } catch {
     return Response.json(
