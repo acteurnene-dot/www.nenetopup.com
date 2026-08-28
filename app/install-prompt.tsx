@@ -1,3 +1,50 @@
 'use client'
+
 import { useEffect, useState } from 'react'
-export default function InstallPrompt() { const [event, setEvent] = useState<any>(null); const [installed, setInstalled] = useState(false); useEffect(() => { const onBefore = (e: Event) => { e.preventDefault(); setEvent(e) }; window.addEventListener('beforeinstallprompt', onBefore); setInstalled(window.matchMedia('(display-mode: standalone)').matches); if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {}); return () => window.removeEventListener('beforeinstallprompt', onBefore) }, []); if (installed || !event) return null; return <button className="install-button" onClick={async () => { await event.prompt(); setEvent(null) }}>Enstale app la</button> }
+
+type InstallEvent = Event & { prompt: () => Promise<void>; userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }> }
+
+export default function InstallPrompt() {
+  const [installEvent, setInstallEvent] = useState<InstallEvent | null>(null)
+  const [installed, setInstalled] = useState(false)
+  const [showHelp, setShowHelp] = useState(false)
+
+  useEffect(() => {
+    const onBeforeInstall = (event: Event) => {
+      event.preventDefault()
+      setInstallEvent(event as InstallEvent)
+    }
+
+    setInstalled(window.matchMedia('(display-mode: standalone)').matches || Boolean((window.navigator as Navigator & { standalone?: boolean }).standalone))
+    window.addEventListener('beforeinstallprompt', onBeforeInstall)
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {})
+
+    return () => window.removeEventListener('beforeinstallprompt', onBeforeInstall)
+  }, [])
+
+  if (installed) return null
+
+  async function handleInstall() {
+    if (!installEvent) {
+      setShowHelp((current) => !current)
+      return
+    }
+
+    await installEvent.prompt()
+    setInstallEvent(null)
+  }
+
+  return (
+    <div className="install-wrap">
+      <button className="install-button" onClick={handleInstall} aria-expanded={showHelp}>
+        Enstale app la
+      </button>
+      {showHelp && !installEvent && (
+        <div className="install-help" role="status">
+          <strong>Sou telefòn ou</strong>
+          <span>Android: ouvri meni navigatè a epi chwazi “Add to Home screen”. iPhone: peze Share, apre sa “Add to Home Screen”.</span>
+        </div>
+      )}
+    </div>
+  )
+}
