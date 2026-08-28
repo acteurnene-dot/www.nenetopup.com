@@ -1,0 +1,3 @@
+'use client'
+import { useEffect, useState } from 'react'
+export default function InstallPrompt() { const [event, setEvent] = useState<any>(null); const [installed, setInstalled] = useState(false); useEffect(() => { const onBefore = (e: Event) => { e.preventDefault(); setEvent(e) }; window.addEventListener('beforeinstallprompt', onBefore); setInstalled(window.matchMedia('(display-mode: standalone)').matches); if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {}); return () => window.removeEventListener('beforeinstallprompt', onBefore) }, []); if (installed || !event) return null; return <button className="install-button" onClick={async () => { await event.prompt(); setEvent(null) }}>Enstale app la</button> }

@@ -1,7 +1,8 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { Apple, Check, ChevronDown, MessageCircle, ShoppingCart, Smartphone, Trash2, X } from 'lucide-react'
+import { Apple, Check, ChevronDown, MessageCircle, ShoppingCart, Smartphone, Trash2, X, UserRound } from 'lucide-react'
+import InstallPrompt from './install-prompt'
 
 type Product = { name: string; duration: string; price: number }
 type PaymentMethod = 'NatCash' | 'MonCash'
@@ -109,7 +110,7 @@ export default function Page() {
 
   return (
     <div className="storefront">
-      <header className="site-header"><div className="nav-shell"><a className="brand" href="#top" aria-label="Nene Store et Celeste Company">NENE STORE <span>ET CELESTE COMPANY</span></a><button className="cart-button" onClick={() => setCartOpen(true)} aria-label={`Louvri panier, ${cart.length} atik`}><ShoppingCart size={18} /><span>Panier</span><b>{cart.length}</b></button></div></header>
+      <header className="site-header"><div className="nav-shell"><a className="brand" href="#top" aria-label="Nene Store et Celeste Company">NENE STORE <span>ET CELESTE COMPANY</span></a><div className="nav-actions"><InstallPrompt /><a className="account-link" href="/account"><UserRound size={17} /> Kont mwen</a><button className="cart-button" onClick={() => setCartOpen(true)} aria-label={`Louvri panier, ${cart.length} atik`}><ShoppingCart size={18} /><span>Panier</span><b>{cart.length}</b></button></div></div></header>
       <main id="top" className="container">
         <section className="hero" aria-labelledby="page-title"><div className="badge"><span className="flag-dot">HT</span> NENE STORE ET CELESTE COMPANY</div><p className="eyebrow">SERVICE RAPIDE · DISPONIB KI FÈ W KONFYANS</p><h1 id="page-title">CONFIGURATION<br /><em>pou telefòn ou.</em></h1><p className="hero-copy">Chwazi configuration ki koresponn ak telefòn ou.<br />Aktive sèvis ou fasil, an kèk klik.</p></section>
         <section className="configuration-section" aria-labelledby="config-title"><div className="section-heading"><span className="section-kicker">01</span><h2 id="config-title">Chwazi aparèy ou</h2></div><div className="device-grid">
