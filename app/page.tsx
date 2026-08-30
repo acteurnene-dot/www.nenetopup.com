@@ -1,20 +1,21 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { Apple, Check, ChevronDown, MessageCircle, ShoppingCart, Smartphone, Trash2, X } from 'lucide-react'
+import { Apple, Check, ChevronDown, Flame, MessageCircle, ShoppingCart, Smartphone, Trash2, X } from 'lucide-react'
 
-type Product = { name: string; duration: string; price: number }
+type Product = { name: string; duration: string; price: number; type: 'android' | 'iphone' | 'free-fire' }
 type PaymentMethod = 'NatCash' | 'MonCash'
 
 const products: Product[] = [
-  { name: 'Android Configuration', duration: '1 mois', price: 500 },
-  { name: 'Android Configuration', duration: '3 mois', price: 1000 },
-  { name: 'Android Configuration', duration: 'Illimité', price: 1500 },
-  { name: 'Android Configuration', duration: 'Proxy illimité', price: 1000 },
-  { name: 'iPhone Configuration', duration: '1 mois', price: 500 },
-  { name: 'iPhone Configuration', duration: '3 mois', price: 1000 },
-  { name: 'iPhone Configuration', duration: 'Illimité', price: 1500 },
-  { name: 'iPhone Configuration', duration: 'Proxy illimité', price: 1000 },
+  { name: 'Android Configuration', duration: '1 mois', price: 500, type: 'android' },
+  { name: 'Android Configuration', duration: '3 mois', price: 1000, type: 'android' },
+  { name: 'Android Configuration', duration: 'Illimité', price: 1500, type: 'android' },
+  { name: 'Android Configuration', duration: 'Proxy illimité', price: 1000, type: 'android' },
+  { name: 'iPhone Configuration', duration: '1 mois', price: 500, type: 'iphone' },
+  { name: 'iPhone Configuration', duration: '3 mois', price: 1000, type: 'iphone' },
+  { name: 'iPhone Configuration', duration: 'Illimité', price: 1500, type: 'iphone' },
+  { name: 'iPhone Configuration', duration: 'Proxy illimité', price: 1000, type: 'iphone' },
+  { name: 'Free Fire', duration: 'Beta', price: 500, type: 'free-fire' },
 ]
 
 const paymentAccounts: Record<PaymentMethod, string> = { NatCash: '41591807', MonCash: '47384728' }
@@ -23,7 +24,7 @@ const formatPrice = (price: number) => `${price.toLocaleString('fr-FR')} HTG`
 export default function Page() {
   const [cart, setCart] = useState<Product[]>([])
   const [cartOpen, setCartOpen] = useState(false)
-  const [activeType, setActiveType] = useState<'android' | 'iphone' | null>(null)
+  const [activeType, setActiveType] = useState<'android' | 'iphone' | 'free-fire' | null>(null)
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('NatCash')
   const [reference, setReference] = useState('')
   const [paymentScreenshot, setPaymentScreenshot] = useState<File | null>(null)
@@ -43,9 +44,9 @@ export default function Page() {
   }, [paymentScreenshot])
 
   const total = useMemo(() => cart.reduce((sum, product) => sum + product.price, 0), [cart])
-  const activeProducts = products.filter((product) => product.name.toLowerCase().startsWith(activeType ?? ''))
+  const activeProducts = products.filter((product) => product.type === activeType)
 
-  function showPlans(type: 'android' | 'iphone') {
+  function showPlans(type: 'android' | 'iphone' | 'free-fire') {
     setActiveType(type)
     requestAnimationFrame(() => document.getElementById(`${type}-plans`)?.scrollIntoView({ behavior: 'smooth', block: 'start' }))
   }
@@ -113,10 +114,11 @@ export default function Page() {
       <main id="top" className="container">
         <section className="hero" aria-labelledby="page-title"><div className="badge"><span className="flag-dot">HT</span> NENE STORE ET CELESTE COMPANY</div><p className="eyebrow">SERVICE RAPIDE · DISPONIB KI FÈ W KONFYANS</p><h1 id="page-title">CONFIGURATION<br /><em>pou telefòn ou.</em></h1><p className="hero-copy">Chwazi configuration ki koresponn ak telefòn ou.<br />Aktive sèvis ou fasil, an kèk klik.</p></section>
         <section className="configuration-section" aria-labelledby="config-title"><div className="section-heading"><span className="section-kicker">01</span><h2 id="config-title">Chwazi aparèy ou</h2></div><div className="device-grid">
-          <button className={`device-card ${activeType === 'android' ? 'selected' : ''}`} onClick={() => showPlans('android')}><span className="device-icon android-icon"><Smartphone size={34} /></span><span><strong>Android</strong><small>Configuration pou telefòn Android.</small></span><ChevronDown className="card-arrow" size={20} /></button>
-          <button className={`device-card ${activeType === 'iphone' ? 'selected' : ''}`} onClick={() => showPlans('iphone')}><span className="device-icon iphone-icon"><Apple size={34} /></span><span><strong>iPhone</strong><small>Configuration pou iPhone.</small></span><ChevronDown className="card-arrow" size={20} /></button>
+          <button className={`device-card ${activeType === 'android' ? 'selected' : ''}`} onClick={() => showPlans('android')}><span className="device-icon android-icon"><Smartphone size={34} aria-hidden="true" /></span><span><strong>Android</strong><small>Logo Android · Configuration pou telefòn Android.</small></span><ChevronDown className="card-arrow" size={20} /></button>
+          <button className={`device-card ${activeType === 'iphone' ? 'selected' : ''}`} onClick={() => showPlans('iphone')}><span className="device-icon iphone-icon"><Apple size={34} aria-hidden="true" /></span><span><strong>iPhone</strong><small>Logo Apple · Configuration pou iPhone.</small></span><ChevronDown className="card-arrow" size={20} /></button>
+          <button className={`device-card ${activeType === 'free-fire' ? 'selected' : ''}`} onClick={() => showPlans('free-fire')}><span className="device-icon free-fire-icon"><Flame size={34} aria-hidden="true" /></span><span><strong>Free Fire</strong><small>Logo Free Fire · Aksè Beta pou jwè yo.</small></span><ChevronDown className="card-arrow" size={20} /></button>
         </div></section>
-        {activeType && <section id={`${activeType}-plans`} className="plans-section" aria-labelledby="plans-title"><div className="plans-heading"><div><span className="section-kicker">02</span><h2 id="plans-title">{activeType === 'android' ? 'Android' : 'iPhone'} Configuration</h2></div><button className="close-plans" onClick={() => setActiveType(null)}><X size={16} /> Fèmen</button></div><div className="plan-list">{activeProducts.map((product) => <div className="plan" key={product.duration}><div className="plan-info"><span className="check"><Check size={15} /></span><span><strong>{product.duration}</strong><small>Aktivasyon imedya</small></span></div><strong className="price">{formatPrice(product.price)}</strong><button className="add-button" onClick={() => addToCart(product)}>Ajouter</button></div>)}</div></section>}
+        {activeType && <section id={`${activeType}-plans`} className="plans-section" aria-labelledby="plans-title"><div className="plans-heading"><div><span className="section-kicker">02</span><h2 id="plans-title">{activeType === 'android' ? 'Android' : activeType === 'iphone' ? 'iPhone' : 'Free Fire'} {activeType === 'free-fire' ? 'Beta' : 'Configuration'}</h2></div><button className="close-plans" onClick={() => setActiveType(null)}><X size={16} /> Fèmen</button></div><div className="plan-list">{activeProducts.map((product) => <div className="plan" key={product.duration}><div className="plan-info"><span className="check"><Check size={15} /></span><span><strong>{product.duration}</strong><small>Aktivasyon imedya</small></span></div><strong className="price">{formatPrice(product.price)}</strong><button className="add-button" onClick={() => addToCart(product)}>Ajouter</button></div>)}</div></section>}
       </main>
       <footer><strong>NENE STORE <span>ET CELESTE COMPANY</span></strong><p>Kesyon? Kontakte nou sou WhatsApp</p><a href="https://wa.me/50941591807">+509 4159-1807 <MessageCircle size={16} /></a></footer>
       {cartOpen && <div className="cart-backdrop" onClick={() => setCartOpen(false)} aria-hidden="true" />}
