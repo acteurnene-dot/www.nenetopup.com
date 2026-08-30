@@ -32,7 +32,7 @@ h2 { margin: 0; font-size: 1.3rem; letter-spacing: -.025em; }
 .device-card { display: flex; align-items: center; gap: 1rem; min-height: 150px; padding: 1.3rem; text-align: left; color: var(--foreground); border: 1px solid var(--line); border-radius: 16px; background: var(--panel); transition: .2s; }
 .device-card:hover, .device-card.selected { border-color: var(--violet); transform: translateY(-2px); }
 .device-icon { display: grid; place-items: center; flex: 0 0 62px; height: 62px; border-radius: 15px; overflow: hidden; }
-.android-icon { color: #86efac; background: #14342b; } .iphone-icon { color: #c4b5fd; background: #292343; } .free-fire-icon { background: #422016; } .free-fire-icon img { width: 100%; height: 100%; object-fit: cover; }
+.android-icon { background: #14342b; } .iphone-icon { background: #292343; } .free-fire-icon { background: #422016; } .device-icon img { width: 100%; height: 100%; object-fit: cover; }
 .device-card strong { display: block; font-size: 1.05rem; } .device-card small, .plan-info small, .cart-item small { display: block; margin-top: .35rem; color: var(--muted); font-size: .78rem; line-height: 1.4; }
 .card-arrow { margin-left: auto; color: #64748b; }
 .plans-heading { justify-content: space-between; align-items: flex-end; } .plans-heading > div { display: flex; gap: .75rem; align-items: center; } .close-plans, .clear { display: inline-flex; align-items: center; gap: .4rem; border: 0; color: var(--muted); background: transparent; font-size: .78rem; }
