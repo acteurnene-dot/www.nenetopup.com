@@ -38,11 +38,11 @@ export default function Page() {
   useEffect(() => {
     const video = promoVideoRef.current
     if (!video) return
-    video.muted = false
-    void video.play().catch(() => {
-      video.muted = true
-      void video.play().catch(() => undefined)
-    })
+    video.muted = true
+    const startPlayback = () => void video.play().catch(() => undefined)
+    video.addEventListener('canplay', startPlayback)
+    startPlayback()
+    return () => video.removeEventListener('canplay', startPlayback)
   }, [])
 
   function enablePromoSound() {
