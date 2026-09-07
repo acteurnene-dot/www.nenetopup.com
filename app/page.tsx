@@ -38,11 +38,11 @@ export default function Page() {
   useEffect(() => {
     const video = promoVideoRef.current
     if (!video) return
-    video.muted = false
-    void video.play().catch(() => {
-      video.muted = true
-      void video.play().catch(() => undefined)
-    })
+    video.muted = true
+    const startPlayback = () => void video.play().catch(() => undefined)
+    video.addEventListener('canplay', startPlayback)
+    startPlayback()
+    return () => video.removeEventListener('canplay', startPlayback)
   }, [])
 
   function enablePromoSound() {
@@ -132,7 +132,7 @@ export default function Page() {
       <header className="site-header"><div className="nav-shell"><a className="brand" href="#top" aria-label="Nene Store et Celeste Company">NENE STORE <span>ET CELESTE COMPANY</span></a><button className="cart-button" onClick={() => setCartOpen(true)} aria-label={`Louvri panier, ${cart.length} atik`}><ShoppingCart size={18} /><span>Panier</span><b>{cart.length}</b></button></div></header>
       <main id="top" className="container">
         <section className="hero" aria-labelledby="page-title"><div className="badge"><span className="flag-dot">HT</span> NENE STORE ET CELESTE COMPANY</div><p className="eyebrow">SERVICE RAPIDE · DISPONIB KI FÈ W KONFYANS</p><h1 id="page-title">CONFIGURATION<br /><em>pou telefòn ou.</em></h1><p className="hero-copy">Chwazi configuration ki koresponn ak telefòn ou.<br />Aktive sèvis ou fasil, an kèk klik.</p></section>
-        <section className="promo-video-section" aria-labelledby="promo-video-title"><div className="section-heading"><span className="section-kicker">VIDEO</span><h2 id="promo-video-title">Proxy</h2></div><div className="promo-video-frame"><video ref={promoVideoRef} className="promo-video" autoPlay loop playsInline preload="auto" aria-label="Videyo prezantasyon Proxy"><source src="/cuban-proxy-promo.mp4" type="video/mp4" />Navigatè ou pa sipòte videyo sa a.</video><button className="video-sound-button" type="button" onClick={enablePromoSound} aria-label="Aktive son videyo a">Aktive son</button></div></section>
+        <section className="promo-video-section" aria-labelledby="promo-video-title"><div className="section-heading"><span className="section-kicker">VIDEO</span><h2 id="promo-video-title">Proxy</h2></div><div className="promo-video-frame"><video ref={promoVideoRef} className="promo-video" autoPlay loop playsInline preload="auto" aria-label="Videyo prezantasyon Proxy"><source src="/proxy-promo.mp4" type="video/mp4" />Navigatè ou pa sipòte videyo sa a.</video><button className="video-sound-button" type="button" onClick={enablePromoSound} aria-label="Aktive son videyo a">Aktive son</button></div></section>
         <section className="configuration-section" aria-labelledby="config-title"><div className="section-heading"><span className="section-kicker">01</span><h2 id="config-title">Chwazi aparèy ou</h2></div><div className="device-grid">
           <button className={`device-card ${activeType === 'android' ? 'selected' : ''}`} onClick={() => showPlans('android')}><span className="device-icon android-icon"><img src="/android-logo.jpg" alt="Logo Android" /></span><span><strong>Android</strong><small>Logo Android · Configuration pou telefòn Android.</small></span><ChevronDown className="card-arrow" size={20} /></button>
           <button className={`device-card ${activeType === 'iphone' ? 'selected' : ''}`} onClick={() => showPlans('iphone')}><span className="device-icon iphone-icon"><img src="/apple-logo.jpg" alt="Logo Apple pou iPhone" /></span><span><strong>iPhone</strong><small>Logo Apple · Configuration pou iPhone.</small></span><ChevronDown className="card-arrow" size={20} /></button>
