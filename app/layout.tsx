@@ -4,7 +4,7 @@ import './globals.css'
 
 export const metadata: Metadata = {
   title: 'Nene Store et Celeste Company',
-  description: 'Chwazi epi kòmande configuration pou Android ak iPhone sou WhatsApp.',
+  description: 'Chwazi epi kòmande configuration pou Android, iPhone ak Free Fire Beta sou WhatsApp.',
   generator: 'v0.app',
 }
 
