@@ -1,7 +1,10 @@
 import { put } from '@vercel/blob'
 import { NextResponse } from 'next/server'
 
-const MAX_FILE_SIZE = 10 * 1024 * 1024
+export const runtime = 'nodejs'
+export const maxDuration = 60
+
+const MAX_FILE_SIZE = 8 * 1024 * 1024
 
 function isImageFile(file: File) {
   return file.type.startsWith('image/') || /\.(jpe?g|png|webp|gif|heic|heif)$/i.test(file.name)

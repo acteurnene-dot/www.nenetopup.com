@@ -88,9 +88,15 @@ export default function Page() {
       let screenshotUrl = uploadedScreenshotUrl
       if (!screenshotUrl) {
         const formData = new FormData()
-        formData.append('file', paymentScreenshot)
+        formData.append('file', paymentScreenshot, 'payment-screenshot.jpg')
         const response = await fetch('/api/upload', { method: 'POST', body: formData })
-        const result = await response.json().catch(() => ({}))
+        const responseText = await response.text()
+        let result: { url?: string; error?: string } = {}
+        try {
+          result = JSON.parse(responseText)
+        } catch {
+          result = { error: 'Sèvè a pa retounen yon repons valab.' }
+        }
         if (!response.ok || !result.url) throw new Error(result.error || `Upload foto a echwe (${response.status}).`)
         screenshotUrl = result.url
         setUploadedScreenshotUrl(screenshotUrl)
