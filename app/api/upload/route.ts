@@ -1,4 +1,4 @@
-import { put } from '@vercel/blob'
+import { get, put } from '@vercel/blob'
 import { NextResponse } from 'next/server'
 
 export const runtime = 'nodejs'
@@ -25,6 +25,26 @@ function isImageFile(file: File) {
   return Boolean(getImageContentType(file))
 }
 
+export async function GET(request: Request) {
+  const pathname = new URL(request.url).searchParams.get('pathname')
+  if (!pathname) return NextResponse.json({ error: 'Path foto a manke.' }, { status: 400 })
+
+  try {
+    const { get } = await import('@vercel/blob')
+    const result = await get(pathname, { access: 'private' })
+    if (!result) return new NextResponse('Foto pa jwenn.', { status: 404 })
+    return new NextResponse(result.stream, {
+      headers: {
+        'Content-Type': result.blob.contentType,
+        'Cache-Control': 'private, max-age=3600',
+      },
+    })
+  } catch (error) {
+    console.error('[v0] Payment screenshot delivery failed:', error)
+    return new NextResponse('Foto pa disponib.', { status: 404 })
+  }
+}
+
 export async function POST(request: Request) {
   try {
     const formData = await request.formData()
@@ -43,12 +63,13 @@ export async function POST(request: Request) {
     const contentType = getImageContentType(file) || 'image/jpeg'
     const extension = contentType === 'image/jpeg' ? 'jpg' : contentType.split('/')[1] || 'jpg'
     const blob = await put(`payment-proofs/${crypto.randomUUID()}.${extension}`, file, {
-      access: 'public',
+      access: 'private',
       addRandomSuffix: false,
       contentType,
     })
 
-    return NextResponse.json({ url: blob.url })
+    const origin = new URL(request.url).origin
+    return NextResponse.json({ url: `${origin}/api/upload?pathname=${encodeURIComponent(blob.pathname)}` })
   } catch (error) {
     console.error('[v0] Payment screenshot upload failed:', error)
     return NextResponse.json({ error: 'Upload foto a echwe.' }, { status: 500 })
