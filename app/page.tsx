@@ -88,7 +88,7 @@ export default function Page() {
       let screenshotUrl = uploadedScreenshotUrl
       if (!screenshotUrl) {
         const formData = new FormData()
-        formData.append('file', paymentScreenshot, 'payment-screenshot.jpg')
+        formData.append('file', paymentScreenshot, paymentScreenshot.name || 'payment-screenshot.jpg')
         const response = await fetch('/api/upload', { method: 'POST', body: formData })
         const responseText = await response.text()
         let result: { url?: string; error?: string } = {}

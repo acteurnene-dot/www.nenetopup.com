@@ -4,10 +4,25 @@ import { NextResponse } from 'next/server'
 export const runtime = 'nodejs'
 export const maxDuration = 60
 
-const MAX_FILE_SIZE = 8 * 1024 * 1024
+const MAX_FILE_SIZE = 10 * 1024 * 1024
+
+function getImageContentType(file: File) {
+  if (file.type.startsWith('image/')) return file.type
+  const extension = file.name.split('.').pop()?.toLowerCase()
+  const types: Record<string, string> = {
+    jpg: 'image/jpeg',
+    jpeg: 'image/jpeg',
+    png: 'image/png',
+    webp: 'image/webp',
+    gif: 'image/gif',
+    heic: 'image/heic',
+    heif: 'image/heif',
+  }
+  return extension ? types[extension] : undefined
+} 
 
 function isImageFile(file: File) {
-  return file.type.startsWith('image/') || /\.(jpe?g|png|webp|gif|heic|heif)$/i.test(file.name)
+  return Boolean(getImageContentType(file))
 }
 
 export async function POST(request: Request) {
@@ -25,11 +40,12 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Foto a twò gwo. Maksimòm 10 MB.' }, { status: 400 })
     }
 
-    const extension = file.name.split('.').pop()?.toLowerCase().replace(/[^a-z0-9]/g, '') || 'jpg'
+    const contentType = getImageContentType(file) || 'image/jpeg'
+    const extension = contentType === 'image/jpeg' ? 'jpg' : contentType.split('/')[1] || 'jpg'
     const blob = await put(`payment-proofs/${crypto.randomUUID()}.${extension}`, file, {
       access: 'public',
       addRandomSuffix: false,
-      contentType: file.type,
+      contentType,
     })
 
     return NextResponse.json({ url: blob.url })
