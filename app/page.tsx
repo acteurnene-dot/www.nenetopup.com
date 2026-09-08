@@ -90,8 +90,8 @@ export default function Page() {
         const formData = new FormData()
         formData.append('file', paymentScreenshot)
         const response = await fetch('/api/upload', { method: 'POST', body: formData })
-        const result = await response.json()
-        if (!response.ok || !result.url) throw new Error(result.error || 'Upload foto a echwe.')
+        const result = await response.json().catch(() => ({}))
+        if (!response.ok || !result.url) throw new Error(result.error || `Upload foto a echwe (${response.status}).`)
         screenshotUrl = result.url
         setUploadedScreenshotUrl(screenshotUrl)
       }

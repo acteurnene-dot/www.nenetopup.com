@@ -1,8 +1,11 @@
 import { put } from '@vercel/blob'
 import { NextResponse } from 'next/server'
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024
-const ALLOWED_TYPES = new Set(['image/png', 'image/jpeg', 'image/webp'])
+const MAX_FILE_SIZE = 10 * 1024 * 1024
+
+function isImageFile(file: File) {
+  return file.type.startsWith('image/') || /\.(jpe?g|png|webp|gif|heic|heif)$/i.test(file.name)
+}
 
 export async function POST(request: Request) {
   try {
@@ -12,14 +15,14 @@ export async function POST(request: Request) {
     if (!(file instanceof File)) {
       return NextResponse.json({ error: 'Pa gen fichye.' }, { status: 400 })
     }
-    if (!ALLOWED_TYPES.has(file.type)) {
-      return NextResponse.json({ error: 'Fòma foto a pa sipòte.' }, { status: 400 })
+    if (!isImageFile(file)) {
+      return NextResponse.json({ error: 'Chwazi yon imaj JPG, PNG, WEBP oswa HEIC.' }, { status: 400 })
     }
     if (file.size > MAX_FILE_SIZE) {
-      return NextResponse.json({ error: 'Foto a twò gwo. Maksimòm 5 MB.' }, { status: 400 })
+      return NextResponse.json({ error: 'Foto a twò gwo. Maksimòm 10 MB.' }, { status: 400 })
     }
 
-    const extension = file.name.split('.').pop()?.toLowerCase() || 'jpg'
+    const extension = file.name.split('.').pop()?.toLowerCase().replace(/[^a-z0-9]/g, '') || 'jpg'
     const blob = await put(`payment-proofs/${crypto.randomUUID()}.${extension}`, file, {
       access: 'public',
       addRandomSuffix: false,
