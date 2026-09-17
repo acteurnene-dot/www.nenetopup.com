@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Check, ChevronDown, MessageCircle, ShoppingCart, Trash2, X } from 'lucide-react'
 
 type Product = { name: string; duration: string; price: number; type: 'android' | 'iphone' | 'free-fire' | 'cuban-proxy' | 'miguel-ios' }
-type PaymentMethod = 'MonCash'
+type PaymentMethod = 'MonCash' | 'NatCash'
 
 const products: Product[] = [
   { name: 'Android Configuration', duration: '1 mois', price: 500, type: 'android' },
@@ -21,14 +21,14 @@ const products: Product[] = [
   { name: 'Miguel iOS iPhone', duration: '7 jou', price: 750, type: 'miguel-ios' },
 ]
 
-const paymentAccounts: Record<PaymentMethod, string> = { MonCash: '47384728' }
+const paymentAccounts: Record<PaymentMethod, string> = { MonCash: '47384728', NatCash: '47384728' }
 const formatPrice = (price: number) => `${price.toLocaleString('fr-FR')} HTG`
 
 export default function Page() {
   const [cart, setCart] = useState<Product[]>([])
   const [cartOpen, setCartOpen] = useState(false)
   const [activeType, setActiveType] = useState<'android' | 'iphone' | 'free-fire' | 'cuban-proxy' | 'miguel-ios' | null>(null)
-  const [paymentMethod] = useState<PaymentMethod>('MonCash')
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('MonCash')
   const [reference, setReference] = useState('')
   const [verified, setVerified] = useState(false)
   const [verifying, setVerifying] = useState(false)
@@ -66,6 +66,12 @@ export default function Page() {
   }
 
   async function verifyMonCashPayment() {
+    if (paymentMethod === 'NatCash') {
+      setVerified(true)
+      setError('')
+      return
+    }
+
     if (!cart.length || !reference.trim()) {
       setError('Tanpri antre transaction code MonCash la.')
       return
@@ -91,8 +97,8 @@ export default function Page() {
   }
 
   function checkout() {
-    if (!cart.length || !verified) {
-      setError('Verifye peman MonCash la anvan ou voye kòmand lan.')
+    if (!cart.length || (paymentMethod === 'MonCash' && !verified)) {
+      setError(`Konfime peman ${paymentMethod} la anvan ou voye kòmand lan.`)
       return
     }
 
@@ -141,8 +147,8 @@ export default function Page() {
       <aside className={`cart-box ${cartOpen ? 'active' : ''}`} aria-label="Panier"><div className="cart-header"><div><span className="section-kicker">PANIER</span><h2>Atik ou chwazi yo</h2></div><button onClick={() => setCartOpen(false)} aria-label="Fèmen panier"><X size={20} /></button></div>
         {cart.length === 0 ? <p className="empty-cart">Panier vid. Chwazi yon configuration dabò.</p> : <div className="cart-items">{cart.map((product, index) => <div className="cart-item" key={`${product.duration}-${index}`}><span>{product.name}<small>{product.duration}</small></span><strong>{formatPrice(product.price)}</strong></div>)}</div>}
         <div className="total"><span>Total</span><strong>{formatPrice(total)}</strong></div>
-        {cart.length > 0 && <div className="payment-area"><p className="payment-title">03 · Peye epi konfime kòmand ou</p><p className="payment-help">Voye {formatPrice(total)} sou MonCash, apre sa antre transaction code la pou verifikasyon otomatik.</p><div className="payment-options"><div className="payment-option active"><strong>MonCash</strong><small>47384728</small><span>Otomatik</span></div></div><p className="payment-note"><strong>MonCash:</strong> voye peman an sou <strong>47384728</strong>. Sistèm nan verifye montan ak status tranzaksyon an.</p><label className="reference-label" htmlFor="reference">Transaction code MonCash <span>(obligatwa)</span></label><input id="reference" className="reference-input" value={reference} onChange={(event) => { setReference(event.target.value); setVerified(false); setError('') }} placeholder="Egzanp: 123456789" inputMode="numeric" />{error && <p className="payment-error" role="alert">{error}</p>}{verified && <p className="payment-success" role="status">Peman MonCash verifye avèk siksè.</p>}<button className="verify-payment" type="button" onClick={verifyMonCashPayment} disabled={verifying || !reference.trim()}>{verifying ? 'Ap verifye...' : verified ? 'Peman verifye' : 'Verifye peman MonCash'}</button><p className="payment-note">Apre verifikasyon an, detay kòmand lan ap ouvri sou WhatsApp pou <strong>50941591807</strong>.</p></div>}
-        <button className="checkout" onClick={checkout} disabled={!cart.length || !verified}><MessageCircle size={18} /> Voye kòmand MonCash</button>{cart.length > 0 && <button className="clear" onClick={clearCart}><Trash2 size={15} /> Vide panier</button>}
+        {cart.length > 0 && <div className="payment-area"><p className="payment-title">03 · Peye epi konfime kòmand ou</p><p className="payment-help">Voye {formatPrice(total)} sou MonCash, apre sa antre transaction code la pou verifikasyon otomatik.</p><div className="payment-options"><button type="button" className={`payment-option ${paymentMethod === 'MonCash' ? 'active' : ''}`} onClick={() => { setPaymentMethod('MonCash'); setVerified(false); setError('') }}><strong>MonCash</strong><small>47384728</small><span>Otomatik</span></button><button type="button" className={`payment-option ${paymentMethod === 'NatCash' ? 'active' : ''}`} onClick={() => { setPaymentMethod('NatCash'); setVerified(false); setError('') }}><strong>NatCash</strong><small>47384728</small><span>Manyèl</span></button></div><p className="payment-note"><strong>{paymentMethod}:</strong> voye peman an sou <strong>47384728</strong>. {paymentMethod === 'MonCash' ? 'Sistèm nan verifye montan ak status tranzaksyon an.' : 'Apre ou fin voye li, antre referans la pou nou tcheke kòmand lan manyèlman.'}</p><label className="reference-label" htmlFor="reference">Transaction code {paymentMethod} <span>(obligatwa)</span></label><input id="reference" className="reference-input" value={reference} onChange={(event) => { setReference(event.target.value); setVerified(false); setError('') }} placeholder="Egzanp: 123456789" inputMode="numeric" />{error && <p className="payment-error" role="alert">{error}</p>}{verified && <p className="payment-success" role="status">{paymentMethod} pare pou voye kòmand lan.</p>}<button className="verify-payment" type="button" onClick={verifyMonCashPayment} disabled={verifying || !reference.trim()}>{verifying ? 'Ap verifye...' : verified ? 'Peman konfime' : paymentMethod === 'MonCash' ? 'Verifye peman MonCash' : 'Konfime NatCash'}</button><p className="payment-note">Apre konfimasyon an, detay kòmand lan ap ouvri sou WhatsApp pou <strong>50941591807</strong>.</p></div>}
+        <button className="checkout" onClick={checkout} disabled={!cart.length || !verified}><MessageCircle size={18} /> Voye kòmand {paymentMethod}</button>{cart.length > 0 && <button className="clear" onClick={clearCart}><Trash2 size={15} /> Vide panier</button>}
       </aside>
     </div>
   )
