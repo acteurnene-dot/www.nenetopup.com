@@ -30,6 +30,8 @@ export default function Page() {
   const [activeType, setActiveType] = useState<'android' | 'iphone' | 'free-fire' | 'cuban-proxy' | 'miguel-ios' | null>(null)
   const [paymentMethod] = useState<PaymentMethod>('MonCash')
   const [reference, setReference] = useState('')
+  const [verified, setVerified] = useState(false)
+  const [verifying, setVerifying] = useState(false)
   const [error, setError] = useState('')
   const promoVideoRef = useRef<HTMLVideoElement>(null)
 
@@ -63,10 +65,34 @@ export default function Page() {
     setCartOpen(true)
   }
 
+  async function verifyMonCashPayment() {
+    if (!cart.length || !reference.trim()) {
+      setError('Tanpri antre transaction code MonCash la.')
+      return
+    }
+
+    setVerifying(true)
+    setVerified(false)
+    setError('')
+    try {
+      const response = await fetch('/api/moncash/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ transactionId: reference.trim(), expectedAmount: total }),
+      })
+      const result = (await response.json().catch(() => ({}))) as { verified?: boolean; error?: string }
+      if (!response.ok || !result.verified) throw new Error(result.error || 'MonCash pa konfime peman an.')
+      setVerified(true)
+    } catch (verificationError) {
+      setError(verificationError instanceof Error ? verificationError.message : 'Verifikasyon MonCash echwe.')
+    } finally {
+      setVerifying(false)
+    }
+  }
+
   function checkout() {
-    if (!cart.length) return
-    if (!reference.trim()) {
-      setError('Tanpri antre referans oswa transaction code la apre ou fin voye peman an.')
+    if (!cart.length || !verified) {
+      setError('Verifye peman MonCash la anvan ou voye kòmand lan.')
       return
     }
 
@@ -91,6 +117,7 @@ export default function Page() {
   function clearCart() {
     setCart([])
     setReference('')
+    setVerified(false)
     setError('')
   }
 
@@ -114,8 +141,8 @@ export default function Page() {
       <aside className={`cart-box ${cartOpen ? 'active' : ''}`} aria-label="Panier"><div className="cart-header"><div><span className="section-kicker">PANIER</span><h2>Atik ou chwazi yo</h2></div><button onClick={() => setCartOpen(false)} aria-label="Fèmen panier"><X size={20} /></button></div>
         {cart.length === 0 ? <p className="empty-cart">Panier vid. Chwazi yon configuration dabò.</p> : <div className="cart-items">{cart.map((product, index) => <div className="cart-item" key={`${product.duration}-${index}`}><span>{product.name}<small>{product.duration}</small></span><strong>{formatPrice(product.price)}</strong></div>)}</div>}
         <div className="total"><span>Total</span><strong>{formatPrice(total)}</strong></div>
-        {cart.length > 0 && <div className="payment-area"><p className="payment-title">03 · Peye epi konfime kòmand ou</p><p className="payment-help">Voye {formatPrice(total)} manyèlman sou MonCash, apre sa mete referans tranzaksyon an.</p><div className="payment-options"><div className="payment-option active"><strong>MonCash</strong><small>47384728</small></div></div><p className="payment-note"><strong>MonCash:</strong> voye peman an sou <strong>47384728</strong>. Peman an ap verifye manyèlman.</p><label className="reference-label" htmlFor="reference">Referans oswa transaction code <span>(obligatwa)</span></label><input id="reference" className="reference-input" value={reference} onChange={(event) => { setReference(event.target.value); setError('') }} placeholder="Egzanp: NC123456" />{error && <p className="payment-error" role="alert">{error}</p>}<p className="payment-note">Pa bezwen screenshot. Apre ou klike, detay yo ap ouvri sou WhatsApp pou <strong>50941591807</strong>.</p></div>}
-        <button className="checkout" onClick={checkout} disabled={!cart.length}><MessageCircle size={18} /> Voye kòmand MonCash</button>{cart.length > 0 && <button className="clear" onClick={clearCart}><Trash2 size={15} /> Vide panier</button>}
+        {cart.length > 0 && <div className="payment-area"><p className="payment-title">03 · Peye epi konfime kòmand ou</p><p className="payment-help">Voye {formatPrice(total)} sou MonCash, apre sa antre transaction code la pou verifikasyon otomatik.</p><div className="payment-options"><div className="payment-option active"><strong>MonCash</strong><small>47384728</small><span>Otomatik</span></div></div><p className="payment-note"><strong>MonCash:</strong> voye peman an sou <strong>47384728</strong>. Sistèm nan verifye montan ak status tranzaksyon an.</p><label className="reference-label" htmlFor="reference">Transaction code MonCash <span>(obligatwa)</span></label><input id="reference" className="reference-input" value={reference} onChange={(event) => { setReference(event.target.value); setVerified(false); setError('') }} placeholder="Egzanp: 123456789" inputMode="numeric" />{error && <p className="payment-error" role="alert">{error}</p>}{verified && <p className="payment-success" role="status">Peman MonCash verifye avèk siksè.</p>}<button className="verify-payment" type="button" onClick={verifyMonCashPayment} disabled={verifying || !reference.trim()}>{verifying ? 'Ap verifye...' : verified ? 'Peman verifye' : 'Verifye peman MonCash'}</button><p className="payment-note">Apre verifikasyon an, detay kòmand lan ap ouvri sou WhatsApp pou <strong>50941591807</strong>.</p></div>}
+        <button className="checkout" onClick={checkout} disabled={!cart.length || !verified}><MessageCircle size={18} /> Voye kòmand MonCash</button>{cart.length > 0 && <button className="clear" onClick={clearCart}><Trash2 size={15} /> Vide panier</button>}
       </aside>
     </div>
   )
