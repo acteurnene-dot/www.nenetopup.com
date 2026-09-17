@@ -28,12 +28,8 @@ export default function Page() {
   const [cart, setCart] = useState<Product[]>([])
   const [cartOpen, setCartOpen] = useState(false)
   const [activeType, setActiveType] = useState<'android' | 'iphone' | 'free-fire' | 'cuban-proxy' | 'miguel-ios' | null>(null)
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('NatCash')
+  const [paymentMethod] = useState<PaymentMethod>('MonCash')
   const [reference, setReference] = useState('')
-  const [paymentScreenshot, setPaymentScreenshot] = useState<File | null>(null)
-  const [paymentScreenshotUrl, setPaymentScreenshotUrl] = useState('')
-  const [uploadedScreenshotUrl, setUploadedScreenshotUrl] = useState('')
-  const [isUploading, setIsUploading] = useState(false)
   const [error, setError] = useState('')
   const promoVideoRef = useRef<HTMLVideoElement>(null)
 
@@ -53,16 +49,6 @@ export default function Page() {
     video.muted = false
     void video.play().catch(() => undefined)
   }
-
-  useEffect(() => {
-    if (!paymentScreenshot) {
-      setPaymentScreenshotUrl('')
-      return
-    }
-    const url = URL.createObjectURL(paymentScreenshot)
-    setPaymentScreenshotUrl(url)
-    return () => URL.revokeObjectURL(url)
-  }, [paymentScreenshot])
 
   const total = useMemo(() => cart.reduce((sum, product) => sum + product.price, 0), [cart])
   const activeProducts = products.filter((product) => product.type === activeType)
