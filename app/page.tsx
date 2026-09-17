@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Check, ChevronDown, MessageCircle, ShoppingCart, Trash2, X } from 'lucide-react'
 
 type Product = { name: string; duration: string; price: number; type: 'android' | 'iphone' | 'free-fire' | 'cuban-proxy' | 'miguel-ios' }
-type PaymentMethod = 'NatCash' | 'MonCash'
+type PaymentMethod = 'MonCash'
 
 const products: Product[] = [
   { name: 'Android Configuration', duration: '1 mois', price: 500, type: 'android' },
@@ -21,7 +21,7 @@ const products: Product[] = [
   { name: 'Miguel iOS iPhone', duration: '7 jou', price: 750, type: 'miguel-ios' },
 ]
 
-const paymentAccounts: Record<PaymentMethod, string> = { NatCash: '41591807', MonCash: '47384728' }
+const paymentAccounts: Record<PaymentMethod, string> = { MonCash: '47384728' }
 const formatPrice = (price: number) => `${price.toLocaleString('fr-FR')} HTG`
 
 export default function Page() {
@@ -87,6 +87,14 @@ export default function Page() {
     setError('')
     setIsUploading(true)
     try {
+      const verificationResponse = await fetch('/api/moncash/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ transactionId: reference.trim(), expectedAmount: total }),
+      })
+      const verification = (await verificationResponse.json().catch(() => null)) as { error?: string; verified?: boolean } | null
+      if (!verificationResponse.ok || !verification?.verified) throw new Error(verification?.error || 'MonCash pa konfime peman an.')
+
       let screenshotUrl = uploadedScreenshotUrl
       if (!screenshotUrl) {
         const formData = new FormData()
@@ -155,7 +163,7 @@ export default function Page() {
       <aside className={`cart-box ${cartOpen ? 'active' : ''}`} aria-label="Panier"><div className="cart-header"><div><span className="section-kicker">PANIER</span><h2>Atik ou chwazi yo</h2></div><button onClick={() => setCartOpen(false)} aria-label="Fèmen panier"><X size={20} /></button></div>
         {cart.length === 0 ? <p className="empty-cart">Panier vid. Chwazi yon configuration dabò.</p> : <div className="cart-items">{cart.map((product, index) => <div className="cart-item" key={`${product.duration}-${index}`}><span>{product.name}<small>{product.duration}</small></span><strong>{formatPrice(product.price)}</strong></div>)}</div>}
         <div className="total"><span>Total</span><strong>{formatPrice(total)}</strong></div>
-        {cart.length > 0 && <div className="payment-area"><p className="payment-title">03 · Peye epi konfime kòmand ou</p><p className="payment-help">Voye {formatPrice(total)} sou youn nan nimewo ki anba a, apre sa antre referans tranzaksyon an.</p><p className="payment-note"><strong>MonCash:</strong> voye peman an sou <strong>47384728</strong>. Peman an fèt manyèlman pou kounye a; nou konfime li apre screenshot la.</p><div className="payment-options">{(['NatCash', 'MonCash'] as PaymentMethod[]).map((method) => <button key={method} className={`payment-option ${paymentMethod === method ? 'active' : ''}`} onClick={() => { setPaymentMethod(method); setError('') }}><strong>{method}</strong><small>{paymentAccounts[method]}</small></button>)}</div><label className="reference-label" htmlFor="reference">Referans tranzaksyon <span>(opsyonèl)</span></label><input id="reference" className="reference-input" value={reference} onChange={(event) => { setReference(event.target.value); setError('') }} placeholder="Egzanp: NC123456" /><label className="reference-label" htmlFor="payment-screenshot">Screenshot prèv peman</label><input id="payment-screenshot" className="reference-input" type="file" accept="image/*" onChange={(event) => { const file = event.target.files?.[0] ?? null; setPaymentScreenshot(file); setUploadedScreenshotUrl(''); setError(file ? '' : 'Tanpri chwazi screenshot la.') }} />{paymentScreenshot && paymentScreenshotUrl && <div className="screenshot-preview"><img src={paymentScreenshotUrl} alt="Preview screenshot prèv peman" /><div><strong>{paymentScreenshot.name}</strong><span>Foto a pare pou ajoute sou WhatsApp.</span></div></div>}{error && <p className="payment-error" role="alert">{error}</p>}<p className="payment-note">Apre ou klike, detay yo ap ouvri sou WhatsApp pou <strong>50941591807</strong>.</p></div>}
+        {cart.length > 0 && <div className="payment-area"><p className="payment-title">03 · Peye epi konfime kòmand ou</p><p className="payment-help">Voye {formatPrice(total)} sou MonCash, apre sa antre transaction code la pou verifikasyon otomatik.</p><p className="payment-note"><strong>MonCash:</strong> voye peman an sou <strong>47384728</strong>. Apre peman an, mete transaction code la anba a.</p><div className="payment-options"><div className="payment-option active"><strong>MonCash</strong><small>47384728</small></div></div><label className="reference-label" htmlFor="reference">Transaction code MonCash <span>(obligatwa)</span></label><input id="reference" className="reference-input" value={reference} onChange={(event) => { setReference(event.target.value); setError('') }} placeholder="Egzanp: NC123456" /><label className="reference-label" htmlFor="payment-screenshot">Screenshot prèv peman</label><input id="payment-screenshot" className="reference-input" type="file" accept="image/*" onChange={(event) => { const file = event.target.files?.[0] ?? null; setPaymentScreenshot(file); setUploadedScreenshotUrl(''); setError(file ? '' : 'Tanpri chwazi screenshot la.') }} />{paymentScreenshot && paymentScreenshotUrl && <div className="screenshot-preview"><img src={paymentScreenshotUrl} alt="Preview screenshot prèv peman" /><div><strong>{paymentScreenshot.name}</strong><span>Foto a pare pou ajoute sou WhatsApp.</span></div></div>}{error && <p className="payment-error" role="alert">{error}</p>}<p className="payment-note">Apre ou klike, detay yo ap ouvri sou WhatsApp pou <strong>50941591807</strong>.</p></div>}
         <button className="checkout" onClick={checkout} disabled={!cart.length || isUploading}><MessageCircle size={18} /> {isUploading ? 'Upload foto a...' : 'Voye kòmand sou WhatsApp'}</button>{cart.length > 0 && <button className="clear" onClick={clearCart}><Trash2 size={15} /> Vide panier</button>}
       </aside>
     </div>
