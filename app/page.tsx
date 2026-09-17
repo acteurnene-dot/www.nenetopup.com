@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Check, ChevronDown, MessageCircle, ShoppingCart, Trash2, X } from 'lucide-react'
 
 type Product = { name: string; duration: string; price: number; type: 'android' | 'iphone' | 'free-fire' | 'cuban-proxy' | 'miguel-ios' }
-type PaymentMethod = 'NatCash' | 'MonCash'
+type PaymentMethod = 'MonCash' | 'NatCash'
 
 const products: Product[] = [
   { name: 'Android Configuration', duration: '1 mois', price: 500, type: 'android' },
@@ -21,19 +21,17 @@ const products: Product[] = [
   { name: 'Miguel iOS iPhone', duration: '7 jou', price: 750, type: 'miguel-ios' },
 ]
 
-const paymentAccounts: Record<PaymentMethod, string> = { NatCash: '41591807', MonCash: '47384728' }
+const paymentAccounts: Record<PaymentMethod, string> = { MonCash: '47384728', NatCash: '47384728' }
 const formatPrice = (price: number) => `${price.toLocaleString('fr-FR')} HTG`
 
 export default function Page() {
   const [cart, setCart] = useState<Product[]>([])
   const [cartOpen, setCartOpen] = useState(false)
   const [activeType, setActiveType] = useState<'android' | 'iphone' | 'free-fire' | 'cuban-proxy' | 'miguel-ios' | null>(null)
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('NatCash')
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('MonCash')
   const [reference, setReference] = useState('')
-  const [paymentScreenshot, setPaymentScreenshot] = useState<File | null>(null)
-  const [paymentScreenshotUrl, setPaymentScreenshotUrl] = useState('')
-  const [uploadedScreenshotUrl, setUploadedScreenshotUrl] = useState('')
-  const [isUploading, setIsUploading] = useState(false)
+  const [verified, setVerified] = useState(false)
+  const [verifying, setVerifying] = useState(false)
   const [error, setError] = useState('')
   const promoVideoRef = useRef<HTMLVideoElement>(null)
 
@@ -54,16 +52,6 @@ export default function Page() {
     void video.play().catch(() => undefined)
   }
 
-  useEffect(() => {
-    if (!paymentScreenshot) {
-      setPaymentScreenshotUrl('')
-      return
-    }
-    const url = URL.createObjectURL(paymentScreenshot)
-    setPaymentScreenshotUrl(url)
-    return () => URL.revokeObjectURL(url)
-  }, [paymentScreenshot])
-
   const total = useMemo(() => cart.reduce((sum, product) => sum + product.price, 0), [cart])
   const activeProducts = products.filter((product) => product.type === activeType)
 
@@ -77,61 +65,65 @@ export default function Page() {
     setCartOpen(true)
   }
 
-  async function checkout() {
-    if (!cart.length || isUploading) return
-    if (!paymentScreenshot) {
-      setError('Tanpri chwazi screenshot prèv peman an.')
+  async function verifyMonCashPayment() {
+    if (paymentMethod === 'NatCash') {
+      setVerified(true)
+      setError('')
+      return
+    }
+
+    if (!cart.length || !reference.trim()) {
+      setError('Tanpri antre transaction code MonCash la.')
+      return
+    }
+
+    setVerifying(true)
+    setVerified(false)
+    setError('')
+    try {
+      const response = await fetch('/api/moncash/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ transactionId: reference.trim(), expectedAmount: total }),
+      })
+      const result = (await response.json().catch(() => ({}))) as { verified?: boolean; error?: string }
+      if (!response.ok || !result.verified) throw new Error(result.error || 'MonCash pa konfime peman an.')
+      setVerified(true)
+    } catch (verificationError) {
+      setError(verificationError instanceof Error ? verificationError.message : 'Verifikasyon MonCash echwe.')
+    } finally {
+      setVerifying(false)
+    }
+  }
+
+  function checkout() {
+    if (!cart.length || (paymentMethod === 'MonCash' && !verified)) {
+      setError(`Konfime peman ${paymentMethod} la anvan ou voye kòmand lan.`)
       return
     }
 
     setError('')
-    setIsUploading(true)
-    try {
-      let screenshotUrl = uploadedScreenshotUrl
-      if (!screenshotUrl) {
-        const formData = new FormData()
-        formData.append('file', paymentScreenshot, paymentScreenshot.name || 'payment-screenshot.jpg')
-        const response = await fetch('/api/upload', { method: 'POST', body: formData })
-        const responseText = await response.text()
-        let result: { url?: string; error?: string } = {}
-        try {
-          result = JSON.parse(responseText)
-        } catch {
-          result = { error: 'Sèvè a pa retounen yon repons valab.' }
-        }
-        if (!response.ok || !result.url) throw new Error(result.error || `Upload foto a echwe (${response.status}).`)
-        screenshotUrl = result.url
-        setUploadedScreenshotUrl(screenshotUrl)
-      }
-
-      const lines = cart.map((product) => `• ${product.name} - ${product.duration} : ${formatPrice(product.price)}`).join('\n')
-      const message = [
-        'Bonjou NENE STORE ET CELESTE COMPANY.',
-        '',
-        'Mwen vle kòmande:',
-        lines,
-        '',
-        `Metòd peman: ${paymentMethod}`,
-        `Nimewo peman: ${paymentAccounts[paymentMethod]}`,
-        `Referans tranzaksyon: ${reference.trim() || 'Pa bay'}`,
-        `Foto prèv peman an: ${screenshotUrl}`,
-        `Total: ${formatPrice(total)}`,
-      ].join('\n')
-      window.open(`https://wa.me/50941591807?text=${encodeURIComponent(message)}`, '_blank', 'noopener,noreferrer')
-    } catch (uploadError) {
-      setError(uploadError instanceof Error ? uploadError.message : 'Upload foto a echwe. Eseye ankò.')
-    } finally {
-      setIsUploading(false)
-    }
+    const lines = cart.map((product) => `• ${product.name} - ${product.duration} : ${formatPrice(product.price)}`).join('\n')
+    const message = [
+      'Bonjou NENE STORE ET CELESTE COMPANY.',
+      '',
+      'Mwen vle kòmande:',
+      lines,
+      '',
+      `Metòd peman: ${paymentMethod}`,
+      `Nimewo peman: ${paymentAccounts[paymentMethod]}`,
+      `Referans tranzaksyon: ${reference.trim()}`,
+      `Total: ${formatPrice(total)}`,
+      '',
+      'Peman an fèt manyèlman. Tanpri verifye li anvan livrezon sèvis la.',
+    ].join('\n')
+    window.open(`https://wa.me/50941591807?text=${encodeURIComponent(message)}`, '_blank', 'noopener,noreferrer')
   }
 
   function clearCart() {
     setCart([])
     setReference('')
-    setPaymentScreenshot(null)
-    setPaymentScreenshotUrl('')
-    setUploadedScreenshotUrl('')
-    setIsUploading(false)
+    setVerified(false)
     setError('')
   }
 
@@ -155,8 +147,8 @@ export default function Page() {
       <aside className={`cart-box ${cartOpen ? 'active' : ''}`} aria-label="Panier"><div className="cart-header"><div><span className="section-kicker">PANIER</span><h2>Atik ou chwazi yo</h2></div><button onClick={() => setCartOpen(false)} aria-label="Fèmen panier"><X size={20} /></button></div>
         {cart.length === 0 ? <p className="empty-cart">Panier vid. Chwazi yon configuration dabò.</p> : <div className="cart-items">{cart.map((product, index) => <div className="cart-item" key={`${product.duration}-${index}`}><span>{product.name}<small>{product.duration}</small></span><strong>{formatPrice(product.price)}</strong></div>)}</div>}
         <div className="total"><span>Total</span><strong>{formatPrice(total)}</strong></div>
-        {cart.length > 0 && <div className="payment-area"><p className="payment-title">03 · Peye epi konfime kòmand ou</p><p className="payment-help">Voye {formatPrice(total)} sou youn nan nimewo ki anba a, apre sa antre referans tranzaksyon an.</p><div className="payment-options">{(['NatCash', 'MonCash'] as PaymentMethod[]).map((method) => <button key={method} className={`payment-option ${paymentMethod === method ? 'active' : ''}`} onClick={() => { setPaymentMethod(method); setError('') }}><strong>{method}</strong><small>{paymentAccounts[method]}</small></button>)}</div><label className="reference-label" htmlFor="reference">Referans tranzaksyon <span>(opsyonèl)</span></label><input id="reference" className="reference-input" value={reference} onChange={(event) => { setReference(event.target.value); setError('') }} placeholder="Egzanp: NC123456" /><label className="reference-label" htmlFor="payment-screenshot">Screenshot prèv peman</label><input id="payment-screenshot" className="reference-input" type="file" accept="image/*" onChange={(event) => { const file = event.target.files?.[0] ?? null; setPaymentScreenshot(file); setUploadedScreenshotUrl(''); setError(file ? '' : 'Tanpri chwazi screenshot la.') }} />{paymentScreenshot && paymentScreenshotUrl && <div className="screenshot-preview"><img src={paymentScreenshotUrl} alt="Preview screenshot prèv peman" /><div><strong>{paymentScreenshot.name}</strong><span>Foto a pare pou ajoute sou WhatsApp.</span></div></div>}{error && <p className="payment-error" role="alert">{error}</p>}<p className="payment-note">Apre ou klike, detay yo ap ouvri sou WhatsApp pou <strong>50941591807</strong>.</p></div>}
-        <button className="checkout" onClick={checkout} disabled={!cart.length || isUploading}><MessageCircle size={18} /> {isUploading ? 'Upload foto a...' : 'Voye kòmand sou WhatsApp'}</button>{cart.length > 0 && <button className="clear" onClick={clearCart}><Trash2 size={15} /> Vide panier</button>}
+        {cart.length > 0 && <div className="payment-area"><p className="payment-title">03 · Peye epi konfime kòmand ou</p><p className="payment-help">Voye {formatPrice(total)} sou MonCash, apre sa antre transaction code la pou verifikasyon otomatik.</p><div className="payment-options"><button type="button" className={`payment-option ${paymentMethod === 'MonCash' ? 'active' : ''}`} onClick={() => { setPaymentMethod('MonCash'); setVerified(false); setError('') }}><strong>MonCash</strong><small>47384728</small><span>Otomatik</span></button><button type="button" className={`payment-option ${paymentMethod === 'NatCash' ? 'active' : ''}`} onClick={() => { setPaymentMethod('NatCash'); setVerified(false); setError('') }}><strong>NatCash</strong><small>47384728</small><span>Manyèl</span></button></div><p className="payment-note"><strong>{paymentMethod}:</strong> voye peman an sou <strong>47384728</strong>. {paymentMethod === 'MonCash' ? 'Sistèm nan verifye montan ak status tranzaksyon an.' : 'Apre ou fin voye li, antre referans la pou nou tcheke kòmand lan manyèlman.'}</p><label className="reference-label" htmlFor="reference">Transaction code {paymentMethod} <span>(obligatwa)</span></label><input id="reference" className="reference-input" value={reference} onChange={(event) => { setReference(event.target.value); setVerified(false); setError('') }} placeholder="Egzanp: 123456789" inputMode="numeric" />{error && <p className="payment-error" role="alert">{error}</p>}{verified && <p className="payment-success" role="status">{paymentMethod} pare pou voye kòmand lan.</p>}<button className="verify-payment" type="button" onClick={verifyMonCashPayment} disabled={verifying || !reference.trim()}>{verifying ? 'Ap verifye...' : verified ? 'Peman konfime' : paymentMethod === 'MonCash' ? 'Verifye peman MonCash' : 'Konfime NatCash'}</button><p className="payment-note">Apre konfimasyon an, detay kòmand lan ap ouvri sou WhatsApp pou <strong>50941591807</strong>.</p></div>}
+        <button className="checkout" onClick={checkout} disabled={!cart.length || !verified}><MessageCircle size={18} /> Voye kòmand {paymentMethod}</button>{cart.length > 0 && <button className="clear" onClick={clearCart}><Trash2 size={15} /> Vide panier</button>}
       </aside>
     </div>
   )
