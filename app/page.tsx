@@ -63,69 +63,34 @@ export default function Page() {
     setCartOpen(true)
   }
 
-  async function checkout() {
-    if (!cart.length || isUploading) return
-    if (!paymentScreenshot) {
-      setError('Tanpri chwazi screenshot prèv peman an.')
+  function checkout() {
+    if (!cart.length) return
+    if (!reference.trim()) {
+      setError('Tanpri antre referans oswa transaction code la apre ou fin voye peman an.')
       return
     }
 
     setError('')
-    setIsUploading(true)
-    try {
-      const verificationResponse = await fetch('/api/moncash/verify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ transactionId: reference.trim(), expectedAmount: total }),
-      })
-      const verification = (await verificationResponse.json().catch(() => null)) as { error?: string; verified?: boolean } | null
-      if (!verificationResponse.ok || !verification?.verified) throw new Error(verification?.error || 'MonCash pa konfime peman an.')
-
-      let screenshotUrl = uploadedScreenshotUrl
-      if (!screenshotUrl) {
-        const formData = new FormData()
-        formData.append('file', paymentScreenshot, paymentScreenshot.name || 'payment-screenshot.jpg')
-        const response = await fetch('/api/upload', { method: 'POST', body: formData })
-        const responseText = await response.text()
-        let result: { url?: string; error?: string } = {}
-        try {
-          result = JSON.parse(responseText)
-        } catch {
-          result = { error: 'Sèvè a pa retounen yon repons valab.' }
-        }
-        if (!response.ok || !result.url) throw new Error(result.error || `Upload foto a echwe (${response.status}).`)
-        screenshotUrl = result.url
-        setUploadedScreenshotUrl(screenshotUrl)
-      }
-
-      const lines = cart.map((product) => `• ${product.name} - ${product.duration} : ${formatPrice(product.price)}`).join('\n')
-      const message = [
-        'Bonjou NENE STORE ET CELESTE COMPANY.',
-        '',
-        'Mwen vle kòmande:',
-        lines,
-        '',
-        `Metòd peman: ${paymentMethod}`,
-        `Nimewo peman: ${paymentAccounts[paymentMethod]}`,
-        `Referans tranzaksyon: ${reference.trim() || 'Pa bay'}`,
-        `Foto prèv peman an: ${screenshotUrl}`,
-        `Total: ${formatPrice(total)}`,
-      ].join('\n')
-      window.open(`https://wa.me/50941591807?text=${encodeURIComponent(message)}`, '_blank', 'noopener,noreferrer')
-    } catch (uploadError) {
-      setError(uploadError instanceof Error ? uploadError.message : 'Upload foto a echwe. Eseye ankò.')
-    } finally {
-      setIsUploading(false)
-    }
+    const lines = cart.map((product) => `• ${product.name} - ${product.duration} : ${formatPrice(product.price)}`).join('\n')
+    const message = [
+      'Bonjou NENE STORE ET CELESTE COMPANY.',
+      '',
+      'Mwen vle kòmande:',
+      lines,
+      '',
+      `Metòd peman: ${paymentMethod}`,
+      `Nimewo peman: ${paymentAccounts[paymentMethod]}`,
+      `Referans tranzaksyon: ${reference.trim()}`,
+      `Total: ${formatPrice(total)}`,
+      '',
+      'Peman an fèt manyèlman. Tanpri verifye li anvan livrezon sèvis la.',
+    ].join('\n')
+    window.open(`https://wa.me/50941591807?text=${encodeURIComponent(message)}`, '_blank', 'noopener,noreferrer')
   }
 
   function clearCart() {
     setCart([])
     setReference('')
-    setPaymentScreenshot(null)
-    setPaymentScreenshotUrl('')
-    setUploadedScreenshotUrl('')
-    setIsUploading(false)
     setError('')
   }
 
@@ -149,8 +114,8 @@ export default function Page() {
       <aside className={`cart-box ${cartOpen ? 'active' : ''}`} aria-label="Panier"><div className="cart-header"><div><span className="section-kicker">PANIER</span><h2>Atik ou chwazi yo</h2></div><button onClick={() => setCartOpen(false)} aria-label="Fèmen panier"><X size={20} /></button></div>
         {cart.length === 0 ? <p className="empty-cart">Panier vid. Chwazi yon configuration dabò.</p> : <div className="cart-items">{cart.map((product, index) => <div className="cart-item" key={`${product.duration}-${index}`}><span>{product.name}<small>{product.duration}</small></span><strong>{formatPrice(product.price)}</strong></div>)}</div>}
         <div className="total"><span>Total</span><strong>{formatPrice(total)}</strong></div>
-        {cart.length > 0 && <div className="payment-area"><p className="payment-title">03 · Peye epi konfime kòmand ou</p><p className="payment-help">Voye {formatPrice(total)} sou MonCash, apre sa antre transaction code la pou verifikasyon otomatik.</p><p className="payment-note"><strong>MonCash:</strong> voye peman an sou <strong>47384728</strong>. Apre peman an, mete transaction code la anba a.</p><div className="payment-options"><div className="payment-option active"><strong>MonCash</strong><small>47384728</small></div></div><label className="reference-label" htmlFor="reference">Transaction code MonCash <span>(obligatwa)</span></label><input id="reference" className="reference-input" value={reference} onChange={(event) => { setReference(event.target.value); setError('') }} placeholder="Egzanp: NC123456" /><label className="reference-label" htmlFor="payment-screenshot">Screenshot prèv peman</label><input id="payment-screenshot" className="reference-input" type="file" accept="image/*" onChange={(event) => { const file = event.target.files?.[0] ?? null; setPaymentScreenshot(file); setUploadedScreenshotUrl(''); setError(file ? '' : 'Tanpri chwazi screenshot la.') }} />{paymentScreenshot && paymentScreenshotUrl && <div className="screenshot-preview"><img src={paymentScreenshotUrl} alt="Preview screenshot prèv peman" /><div><strong>{paymentScreenshot.name}</strong><span>Foto a pare pou ajoute sou WhatsApp.</span></div></div>}{error && <p className="payment-error" role="alert">{error}</p>}<p className="payment-note">Apre ou klike, detay yo ap ouvri sou WhatsApp pou <strong>50941591807</strong>.</p></div>}
-        <button className="checkout" onClick={checkout} disabled={!cart.length || isUploading}><MessageCircle size={18} /> {isUploading ? 'Upload foto a...' : 'Voye kòmand sou WhatsApp'}</button>{cart.length > 0 && <button className="clear" onClick={clearCart}><Trash2 size={15} /> Vide panier</button>}
+        {cart.length > 0 && <div className="payment-area"><p className="payment-title">03 · Peye epi konfime kòmand ou</p><p className="payment-help">Voye {formatPrice(total)} manyèlman sou MonCash, apre sa mete referans tranzaksyon an.</p><div className="payment-options"><div className="payment-option active"><strong>MonCash</strong><small>47384728</small></div></div><p className="payment-note"><strong>MonCash:</strong> voye peman an sou <strong>47384728</strong>. Peman an ap verifye manyèlman.</p><label className="reference-label" htmlFor="reference">Referans oswa transaction code <span>(obligatwa)</span></label><input id="reference" className="reference-input" value={reference} onChange={(event) => { setReference(event.target.value); setError('') }} placeholder="Egzanp: NC123456" />{error && <p className="payment-error" role="alert">{error}</p>}<p className="payment-note">Pa bezwen screenshot. Apre ou klike, detay yo ap ouvri sou WhatsApp pou <strong>50941591807</strong>.</p></div>}
+        <button className="checkout" onClick={checkout} disabled={!cart.length}><MessageCircle size={18} /> Voye kòmand MonCash</button>{cart.length > 0 && <button className="clear" onClick={clearCart}><Trash2 size={15} /> Vide panier</button>}
       </aside>
     </div>
   )
