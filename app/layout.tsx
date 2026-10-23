@@ -4,17 +4,21 @@ import './globals.css'
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://nene-celeste.vercel.app'),
-  title: 'Nene Celeste | Android, iPhone, Free Fire ak Proxy',
+  title: {
+    default: 'NENE STORE ET CELESTE COMPANY | Sèvis Android, iPhone ak Proxy',
+    template: '%s | NENE STORE ET CELESTE COMPANY',
+  },
   description:
-    'Nene Celeste ofri sèvis ak lisans pou Android, iPhone, Free Fire Beta, Proxy ak Miguel iOS. Kòmande fasil sou WhatsApp.',
+    'NENE STORE ET CELESTE COMPANY ofri configuration Android, iPhone, Free Fire Beta, Cuban Proxy ak Miguel iOS an Ayiti. Kòmande fasil sou WhatsApp.',
   keywords: [
+    'NENE STORE ET CELESTE COMPANY',
     'Nene Celeste',
-    'Nene Celeste Haiti',
-    'Android Haiti',
-    'iPhone Haiti',
+    'Nene Store Haiti',
+    'configuration Android Haiti',
+    'configuration iPhone Haiti',
     'Free Fire Beta Haiti',
-    'Proxy Haiti',
-    'Miguel iOS iPhone',
+    'Cuban Proxy Haiti',
+    'Miguel iOS iPhone Haiti',
   ],
   alternates: { canonical: '/' },
   openGraph: {
