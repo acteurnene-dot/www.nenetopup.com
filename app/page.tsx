@@ -118,7 +118,7 @@ export default function Page() {
     }
   }
 
-  function checkout() {
+  async function checkout() {
     if (requiresPlayerId && !/^\d{6,15}$/.test(playerId.trim())) {
       setError('Antre ID Free Fire la anvan ou voye kòmand lan.')
       return
@@ -129,6 +129,23 @@ export default function Page() {
     }
 
     setError('')
+    if (requiresPlayerId) {
+      setVerifying(true)
+      try {
+        const response = await fetch('/api/gift-access/order', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ playerId: playerId.trim(), reference: reference.trim() }),
+        })
+        const result = (await response.json().catch(() => ({}))) as { error?: string }
+        if (!response.ok) throw new Error(result.error || 'Top up la pa pase.')
+      } catch (topUpError) {
+        setError(topUpError instanceof Error ? topUpError.message : 'Top up la pa pase.')
+        setVerifying(false)
+        return
+      }
+      setVerifying(false)
+    }
     const lines = cart.map((product) => `• ${product.name} - ${product.duration} : ${formatPrice(product.price)}`).join('\n')
     const message = [
       'Bonjou NENE STORE ET CELESTE COMPANY.',
