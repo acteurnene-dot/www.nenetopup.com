@@ -37,6 +37,7 @@ export default function Page() {
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('MonCash')
   const [reference, setReference] = useState('')
   const [playerId, setPlayerId] = useState('')
+  const [playerIdConfirmed, setPlayerIdConfirmed] = useState(false)
   const [verified, setVerified] = useState(false)
   const [verifying, setVerifying] = useState(false)
   const [error, setError] = useState('')
@@ -71,6 +72,15 @@ export default function Page() {
   function addToCart(product: Product) {
     setCart((current) => [...current, product])
     setCartOpen(true)
+  }
+
+  function confirmPlayerId() {
+    if (!/^\d{6,15}$/.test(playerId.trim())) {
+      setError('Antre yon ID Free Fire ki valab anvan ou konfime.')
+      return
+    }
+    setPlayerIdConfirmed(true)
+    setError('')
   }
 
   async function verifyMonCashPayment() {
@@ -140,6 +150,7 @@ export default function Page() {
   function clearCart() {
     setCart([])
     setPlayerId('')
+    setPlayerIdConfirmed(false)
     setReference('')
     setVerified(false)
     setError('')
@@ -166,8 +177,8 @@ export default function Page() {
       <aside className={`cart-box ${cartOpen ? 'active' : ''}`} aria-label="Panier"><div className="cart-header"><div><span className="section-kicker">PANIER</span><h2>Atik ou chwazi yo</h2></div><button onClick={() => setCartOpen(false)} aria-label="Fèmen panier"><X size={20} /></button></div>
         {cart.length === 0 ? <p className="empty-cart">Panier vid. Chwazi yon configuration dabò.</p> : <div className="cart-items">{cart.map((product, index) => <div className="cart-item" key={`${product.duration}-${index}`}><span>{product.name}<small>{product.duration}</small></span><strong>{formatPrice(product.price)}</strong></div>)}</div>}
         <div className="total"><span>Total</span><strong>{formatPrice(total)}</strong></div>
-        {requiresPlayerId && <div className="player-id-area"><label className="reference-label" htmlFor="free-fire-id">ID Free Fire <span>(obligatwa pou Top Up LATAM)</span></label><input id="free-fire-id" className="reference-input" value={playerId} onChange={(event) => { setPlayerId(event.target.value.replace(/\D/g, '')); setVerified(false); setError('') }} placeholder="Antre ID Free Fire la" inputMode="numeric" /><p className="payment-note">Apre ou mete ID a, peze konfime pou kontinye ak peman an.</p></div>}
-        {cart.length > 0 && <div className="payment-area"><p className="payment-title">03 · Peye epi konfime kòmand ou</p><p className="payment-help">Voye {formatPrice(total)} sou MonCash, apre sa antre transaction code la pou verifikasyon otomatik.</p><div className="payment-options"><button type="button" className={`payment-option ${paymentMethod === 'MonCash' ? 'active' : ''}`} onClick={() => { setPaymentMethod('MonCash'); setVerified(false); setError('') }}><strong>MonCash</strong><small>47384728</small><span>Otomatik</span></button><button type="button" className={`payment-option ${paymentMethod === 'NatCash' ? 'active' : ''}`} onClick={() => { setPaymentMethod('NatCash'); setVerified(false); setError('') }}><strong>NatCash</strong><small>47384728</small><span>Manyèl</span></button></div><p className="payment-note"><strong>{paymentMethod}:</strong> voye peman an sou <strong>47384728</strong>. {paymentMethod === 'MonCash' ? 'Sistèm nan verifye montan ak status tranzaksyon an.' : 'Apre ou fin voye li, antre referans la pou nou tcheke kòmand lan manyèlman.'}</p><label className="reference-label" htmlFor="reference">Transaction code {paymentMethod} <span>(obligatwa)</span></label><input id="reference" className="reference-input" value={reference} onChange={(event) => { setReference(event.target.value); setVerified(false); setError('') }} placeholder="Egzanp: 123456789" inputMode="numeric" />{error && <p className="payment-error" role="alert">{error}</p>}{verified && <p className="payment-success" role="status">Top up ou valide avèk sikse. BONDYE EST TOUT PUISSANT.</p>}<button className="verify-payment" type="button" onClick={verifyMonCashPayment} disabled={verifying || !reference.trim()}>{verifying ? 'Ap verifye...' : verified ? 'Peman konfime' : paymentMethod === 'MonCash' ? 'Verifye peman MonCash' : 'Konfime NatCash'}</button><p className="payment-note">Apre konfimasyon an, detay kòmand lan ap ouvri sou WhatsApp pou <strong>50941591807</strong>.</p></div>}
+        {requiresPlayerId && <div className="player-id-area"><label className="reference-label" htmlFor="free-fire-id">ID Free Fire <span>(obligatwa pou Top Up LATAM)</span></label><input id="free-fire-id" className="reference-input" value={playerId} onChange={(event) => { setPlayerId(event.target.value.replace(/\D/g, '')); setPlayerIdConfirmed(false); setVerified(false); setError('') }} placeholder="Antre ID Free Fire la" inputMode="numeric" /><p className="payment-note">Apre ou mete ID a, peze konfime pou kontinye ak peman an.</p><button className="verify-payment" type="button" onClick={confirmPlayerId}>{playerIdConfirmed ? 'ID konfime' : 'Konfime ID'}</button>{playerIdConfirmed && <p className="payment-success" role="status">ID Free Fire konfime. Kounye a ou ka peye.</p>}</div>}
+        {cart.length > 0 && (!requiresPlayerId || playerIdConfirmed) && <div className="payment-area"><p className="payment-title">03 · Peye epi konfime kòmand ou</p><p className="payment-help">Voye {formatPrice(total)} sou MonCash, apre sa antre transaction code la pou verifikasyon otomatik.</p><div className="payment-options"><button type="button" className={`payment-option ${paymentMethod === 'MonCash' ? 'active' : ''}`} onClick={() => { setPaymentMethod('MonCash'); setVerified(false); setError('') }}><strong>MonCash</strong><small>47384728</small><span>Otomatik</span></button><button type="button" className={`payment-option ${paymentMethod === 'NatCash' ? 'active' : ''}`} onClick={() => { setPaymentMethod('NatCash'); setVerified(false); setError('') }}><strong>NatCash</strong><small>47384728</small><span>Manyèl</span></button></div><p className="payment-note"><strong>{paymentMethod}:</strong> voye peman an sou <strong>47384728</strong>. {paymentMethod === 'MonCash' ? 'Sistèm nan verifye montan ak status tranzaksyon an.' : 'Apre ou fin voye li, antre referans la pou nou tcheke kòmand lan manyèlman.'}</p><label className="reference-label" htmlFor="reference">Transaction code {paymentMethod} <span>(obligatwa)</span></label><input id="reference" className="reference-input" value={reference} onChange={(event) => { setReference(event.target.value); setVerified(false); setError('') }} placeholder="Egzanp: 123456789" inputMode="numeric" />{error && <p className="payment-error" role="alert">{error}</p>}{verified && <p className="payment-success" role="status">Top up ou valide avèk sikse. BONDYE EST TOUT PUISSANT.</p>}<button className="verify-payment" type="button" onClick={verifyMonCashPayment} disabled={verifying || !reference.trim()}>{verifying ? 'Ap verifye...' : verified ? 'Peman konfime' : paymentMethod === 'MonCash' ? 'Verifye peman MonCash' : 'Konfime NatCash'}</button><p className="payment-note">Apre konfimasyon an, detay kòmand lan ap ouvri sou WhatsApp pou <strong>50941591807</strong>.</p></div>}
         <button className="checkout" onClick={checkout} disabled={!cart.length || !verified}><MessageCircle size={18} /> Voye kòmand {paymentMethod}</button>{cart.length > 0 && <button className="clear" onClick={clearCart}><Trash2 size={15} /> Vide panier</button>}
       </aside>
     </div>
