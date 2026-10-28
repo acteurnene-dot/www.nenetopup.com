@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Check, ChevronDown, MessageCircle, ShoppingCart, Trash2, X } from 'lucide-react'
 
-type Product = { name: string; duration: string; price: number; type: 'android' | 'iphone' | 'free-fire' | 'cuban-proxy' | 'miguel-ios' }
+type Product = { name: string; duration: string; price: number; type: 'android' | 'iphone' | 'free-fire' | 'free-fire-latam' | 'cuban-proxy' | 'miguel-ios' }
 type PaymentMethod = 'MonCash' | 'NatCash'
 
 const products: Product[] = [
@@ -16,20 +16,27 @@ const products: Product[] = [
   { name: 'iPhone Configuration', duration: 'Illimité', price: 1500, type: 'iphone' },
   { name: 'iPhone Configuration', duration: 'Proxy illimité', price: 1000, type: 'iphone' },
   { name: 'Free Fire', duration: 'Beta', price: 500, type: 'free-fire' },
+  { name: 'Free Fire LATAM', duration: '110 dyaman', price: 150, type: 'free-fire-latam' },
+  { name: 'Free Fire LATAM', duration: '341 dyaman', price: 450, type: 'free-fire-latam' },
+  { name: 'Free Fire LATAM', duration: '520 dyaman', price: 750, type: 'free-fire-latam' },
+  { name: 'Free Fire LATAM', duration: '1166 dyaman', price: 1500, type: 'free-fire-latam' },
+  { name: 'Free Fire LATAM', duration: '6000 dyaman', price: 7500, type: 'free-fire-latam' },
   { name: 'Cuban Proxy', duration: 'Lisans konplè', price: 1000, type: 'cuban-proxy' },
+
   { name: 'Miguel iOS iPhone', duration: '30 jou', price: 1500, type: 'miguel-ios' },
   { name: 'Miguel iOS iPhone', duration: '7 jou', price: 750, type: 'miguel-ios' },
 ]
 
-const paymentAccounts: Record<PaymentMethod, string> = { MonCash: '47384728', NatCash: '47384728' }
+const paymentAccounts: Record<PaymentMethod, string> = { MonCash: '47384728', NatCash: '41591807' }
 const formatPrice = (price: number) => `${price.toLocaleString('fr-FR')} HTG`
 
 export default function Page() {
   const [cart, setCart] = useState<Product[]>([])
   const [cartOpen, setCartOpen] = useState(false)
-  const [activeType, setActiveType] = useState<'android' | 'iphone' | 'free-fire' | 'cuban-proxy' | 'miguel-ios' | null>(null)
+  const [activeType, setActiveType] = useState<'android' | 'iphone' | 'free-fire' | 'free-fire-latam' | 'cuban-proxy' | 'miguel-ios' | null>(null)
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('MonCash')
   const [reference, setReference] = useState('')
+  const [playerId, setPlayerId] = useState('')
   const [verified, setVerified] = useState(false)
   const [verifying, setVerifying] = useState(false)
   const [error, setError] = useState('')
@@ -54,8 +61,9 @@ export default function Page() {
 
   const total = useMemo(() => cart.reduce((sum, product) => sum + product.price, 0), [cart])
   const activeProducts = products.filter((product) => product.type === activeType)
+  const requiresPlayerId = cart.some((product) => product.type === 'free-fire-latam')
 
-  function showPlans(type: 'android' | 'iphone' | 'free-fire' | 'cuban-proxy' | 'miguel-ios') {
+  function showPlans(type: 'android' | 'iphone' | 'free-fire' | 'free-fire-latam' | 'cuban-proxy' | 'miguel-ios') {
     setActiveType(type)
     requestAnimationFrame(() => document.getElementById(`${type}-plans`)?.scrollIntoView({ behavior: 'smooth', block: 'start' }))
   }
@@ -66,6 +74,10 @@ export default function Page() {
   }
 
   async function verifyMonCashPayment() {
+    if (requiresPlayerId && !/^\d{6,15}$/.test(playerId.trim())) {
+      setError('Antre yon ID Free Fire ki valab anvan ou konfime.')
+      return
+    }
     if (paymentMethod === 'NatCash') {
       setVerified(true)
       setError('')
@@ -97,6 +109,10 @@ export default function Page() {
   }
 
   function checkout() {
+    if (requiresPlayerId && !/^\d{6,15}$/.test(playerId.trim())) {
+      setError('Antre ID Free Fire la anvan ou voye kòmand lan.')
+      return
+    }
     if (!cart.length || (paymentMethod === 'MonCash' && !verified)) {
       setError(`Konfime peman ${paymentMethod} la anvan ou voye kòmand lan.`)
       return
@@ -112,6 +128,7 @@ export default function Page() {
       '',
       `Metòd peman: ${paymentMethod}`,
       `Nimewo peman: ${paymentAccounts[paymentMethod]}`,
+      ...(requiresPlayerId ? [`ID Free Fire: ${playerId.trim()}`] : []),
       `Referans tranzaksyon: ${reference.trim()}`,
       `Total: ${formatPrice(total)}`,
       '',
@@ -122,6 +139,7 @@ export default function Page() {
 
   function clearCart() {
     setCart([])
+    setPlayerId('')
     setReference('')
     setVerified(false)
     setError('')
@@ -137,17 +155,19 @@ export default function Page() {
           <button className={`device-card ${activeType === 'android' ? 'selected' : ''}`} onClick={() => showPlans('android')}><span className="device-icon android-icon"><img src="/android-logo.jpg" alt="Logo Android" /></span><span><strong>Android</strong><small>Logo Android · Configuration pou telefòn Android.</small></span><ChevronDown className="card-arrow" size={20} /></button>
           <button className={`device-card ${activeType === 'iphone' ? 'selected' : ''}`} onClick={() => showPlans('iphone')}><span className="device-icon iphone-icon"><img src="/apple-logo.jpg" alt="Logo Apple pou iPhone" /></span><span><strong>iPhone</strong><small>Logo Apple · Configuration pou iPhone.</small></span><ChevronDown className="card-arrow" size={20} /></button>
           <button className={`device-card ${activeType === 'free-fire' ? 'selected' : ''}`} onClick={() => showPlans('free-fire')}><span className="device-icon free-fire-icon"><img src="/free-fire-beta.jpg" alt="Logo Free Fire Beta" /></span><span><strong>Free Fire Beta</strong><small>Logo Free Fire · Aksè Beta pou jwè yo.</small></span><ChevronDown className="card-arrow" size={20} /></button>
+          <button className={`device-card free-fire-latam-card ${activeType === 'free-fire-latam' ? 'selected' : ''}`} onClick={() => showPlans('free-fire-latam')}><span className="device-icon free-fire-icon"><img src="/free-fire-beta.jpg" alt="Logo Free Fire LATAM" /></span><span><strong>Top Up Free Fire LATAM</strong><small>Achte dyaman LATAM rapidman.</small></span><ChevronDown className="card-arrow" size={20} /></button>
           <button className={`device-card proxy-card ${activeType === 'cuban-proxy' ? 'selected' : ''}`} onClick={() => showPlans('cuban-proxy')}><span className="device-icon proxy-icon"><img src="/cuban-proxy-logo.jpg" alt="Logo Cuban Proxy" /></span><span><strong>Cuban Proxy</strong><small>Proxy Cuban avèk tout lisans li, trè legal.<br />No ban · No blacklist.</small></span><ChevronDown className="card-arrow" size={20} /></button>
           <button className={`device-card miguel-card ${activeType === 'miguel-ios' ? 'selected' : ''}`} onClick={() => showPlans('miguel-ios')}><span className="device-icon iphone-icon"><img src="/apple-logo.jpg" alt="Logo Apple pou Miguel iOS iPhone" /></span><span><strong>Miguel iOS iPhone</strong><small>Chwazi lisans ou pou iPhone.</small></span><ChevronDown className="card-arrow" size={20} /></button>
         </div></section>
-        {activeType && <section id={`${activeType}-plans`} className="plans-section" aria-labelledby="plans-title"><div className="plans-heading"><div><span className="section-kicker">02</span><h2 id="plans-title">{activeType === 'android' ? 'Android' : activeType === 'iphone' ? 'iPhone' : activeType === 'free-fire' ? 'Free Fire Beta' : activeType === 'cuban-proxy' ? 'Cuban Proxy' : 'Miguel iOS iPhone'} {activeType === 'free-fire' || activeType === 'cuban-proxy' || activeType === 'miguel-ios' ? '' : 'Configuration'}</h2></div><button className="close-plans" onClick={() => setActiveType(null)}><X size={16} /> Fèmen</button></div><div className="plan-list">{activeProducts.map((product) => <div className="plan" key={product.duration}><div className="plan-info"><span className="check"><Check size={15} /></span><span><strong>{product.duration}</strong><small>Aktivasyon imedya</small></span></div><strong className="price">{formatPrice(product.price)}</strong><button className="add-button" onClick={() => addToCart(product)}>Ajouter</button></div>)}</div></section>}
+        {activeType && <section id={`${activeType}-plans`} className="plans-section" aria-labelledby="plans-title"><div className="plans-heading"><div><span className="section-kicker">02</span><h2 id="plans-title">{activeType === 'android' ? 'Android' : activeType === 'iphone' ? 'iPhone' : activeType === 'free-fire' ? 'Free Fire Beta' : activeType === 'free-fire-latam' ? 'Top Up Free Fire LATAM' : activeType === 'cuban-proxy' ? 'Cuban Proxy' : 'Miguel iOS iPhone'} {activeType === 'free-fire' || activeType === 'free-fire-latam' || activeType === 'cuban-proxy' || activeType === 'miguel-ios' ? '' : 'Configuration'}</h2></div><button className="close-plans" onClick={() => setActiveType(null)}><X size={16} /> Fèmen</button></div><div className="plan-list">{activeProducts.map((product) => <div className="plan" key={product.duration}><div className="plan-info"><span className="check"><Check size={15} /></span><span><strong>{product.duration}</strong><small>Aktivasyon imedya</small></span></div><strong className="price">{formatPrice(product.price)}</strong><button className="add-button" onClick={() => addToCart(product)}>Ajouter</button></div>)}</div></section>}
       </main>
       <footer><strong>NENE STORE <span>ET CELESTE COMPANY</span></strong><p>Kesyon? Kontakte nou sou WhatsApp</p><a href="https://wa.me/50941591807">+509 4159-1807 <MessageCircle size={16} /></a></footer>
       {cartOpen && <div className="cart-backdrop" onClick={() => setCartOpen(false)} aria-hidden="true" />}
       <aside className={`cart-box ${cartOpen ? 'active' : ''}`} aria-label="Panier"><div className="cart-header"><div><span className="section-kicker">PANIER</span><h2>Atik ou chwazi yo</h2></div><button onClick={() => setCartOpen(false)} aria-label="Fèmen panier"><X size={20} /></button></div>
         {cart.length === 0 ? <p className="empty-cart">Panier vid. Chwazi yon configuration dabò.</p> : <div className="cart-items">{cart.map((product, index) => <div className="cart-item" key={`${product.duration}-${index}`}><span>{product.name}<small>{product.duration}</small></span><strong>{formatPrice(product.price)}</strong></div>)}</div>}
         <div className="total"><span>Total</span><strong>{formatPrice(total)}</strong></div>
-        {cart.length > 0 && <div className="payment-area"><p className="payment-title">03 · Peye epi konfime kòmand ou</p><p className="payment-help">Voye {formatPrice(total)} sou MonCash, apre sa antre transaction code la pou verifikasyon otomatik.</p><div className="payment-options"><button type="button" className={`payment-option ${paymentMethod === 'MonCash' ? 'active' : ''}`} onClick={() => { setPaymentMethod('MonCash'); setVerified(false); setError('') }}><strong>MonCash</strong><small>47384728</small><span>Otomatik</span></button><button type="button" className={`payment-option ${paymentMethod === 'NatCash' ? 'active' : ''}`} onClick={() => { setPaymentMethod('NatCash'); setVerified(false); setError('') }}><strong>NatCash</strong><small>47384728</small><span>Manyèl</span></button></div><p className="payment-note"><strong>{paymentMethod}:</strong> voye peman an sou <strong>47384728</strong>. {paymentMethod === 'MonCash' ? 'Sistèm nan verifye montan ak status tranzaksyon an.' : 'Apre ou fin voye li, antre referans la pou nou tcheke kòmand lan manyèlman.'}</p><label className="reference-label" htmlFor="reference">Transaction code {paymentMethod} <span>(obligatwa)</span></label><input id="reference" className="reference-input" value={reference} onChange={(event) => { setReference(event.target.value); setVerified(false); setError('') }} placeholder="Egzanp: 123456789" inputMode="numeric" />{error && <p className="payment-error" role="alert">{error}</p>}{verified && <p className="payment-success" role="status">{paymentMethod} pare pou voye kòmand lan.</p>}<button className="verify-payment" type="button" onClick={verifyMonCashPayment} disabled={verifying || !reference.trim()}>{verifying ? 'Ap verifye...' : verified ? 'Peman konfime' : paymentMethod === 'MonCash' ? 'Verifye peman MonCash' : 'Konfime NatCash'}</button><p className="payment-note">Apre konfimasyon an, detay kòmand lan ap ouvri sou WhatsApp pou <strong>50941591807</strong>.</p></div>}
+        {requiresPlayerId && <div className="player-id-area"><label className="reference-label" htmlFor="free-fire-id">ID Free Fire <span>(obligatwa pou Top Up LATAM)</span></label><input id="free-fire-id" className="reference-input" value={playerId} onChange={(event) => { setPlayerId(event.target.value.replace(/\D/g, '')); setVerified(false); setError('') }} placeholder="Antre ID Free Fire la" inputMode="numeric" /><p className="payment-note">Apre ou mete ID a, peze konfime pou kontinye ak peman an.</p></div>}
+        {cart.length > 0 && <div className="payment-area"><p className="payment-title">03 · Peye epi konfime kòmand ou</p><p className="payment-help">Voye {formatPrice(total)} sou MonCash, apre sa antre transaction code la pou verifikasyon otomatik.</p><div className="payment-options"><button type="button" className={`payment-option ${paymentMethod === 'MonCash' ? 'active' : ''}`} onClick={() => { setPaymentMethod('MonCash'); setVerified(false); setError('') }}><strong>MonCash</strong><small>47384728</small><span>Otomatik</span></button><button type="button" className={`payment-option ${paymentMethod === 'NatCash' ? 'active' : ''}`} onClick={() => { setPaymentMethod('NatCash'); setVerified(false); setError('') }}><strong>NatCash</strong><small>47384728</small><span>Manyèl</span></button></div><p className="payment-note"><strong>{paymentMethod}:</strong> voye peman an sou <strong>47384728</strong>. {paymentMethod === 'MonCash' ? 'Sistèm nan verifye montan ak status tranzaksyon an.' : 'Apre ou fin voye li, antre referans la pou nou tcheke kòmand lan manyèlman.'}</p><label className="reference-label" htmlFor="reference">Transaction code {paymentMethod} <span>(obligatwa)</span></label><input id="reference" className="reference-input" value={reference} onChange={(event) => { setReference(event.target.value); setVerified(false); setError('') }} placeholder="Egzanp: 123456789" inputMode="numeric" />{error && <p className="payment-error" role="alert">{error}</p>}{verified && <p className="payment-success" role="status">Top up ou valide avèk sikse. BONDYE EST TOUT PUISSANT.</p>}<button className="verify-payment" type="button" onClick={verifyMonCashPayment} disabled={verifying || !reference.trim()}>{verifying ? 'Ap verifye...' : verified ? 'Peman konfime' : paymentMethod === 'MonCash' ? 'Verifye peman MonCash' : 'Konfime NatCash'}</button><p className="payment-note">Apre konfimasyon an, detay kòmand lan ap ouvri sou WhatsApp pou <strong>50941591807</strong>.</p></div>}
         <button className="checkout" onClick={checkout} disabled={!cart.length || !verified}><MessageCircle size={18} /> Voye kòmand {paymentMethod}</button>{cart.length > 0 && <button className="clear" onClick={clearCart}><Trash2 size={15} /> Vide panier</button>}
       </aside>
     </div>
