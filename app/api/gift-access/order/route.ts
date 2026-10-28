@@ -6,8 +6,27 @@ export const runtime = 'nodejs'
 const GIFT_ACCESS_BASE_URL = 'https://portal.gift-access.com/api/v1'
 const GIFT_ACCESS_PRODUCT_ID = '58462'
 
-function getSignature(timestamp: string, method: string, path: string, body: string, secret: string) {
-  return crypto.createHmac('sha256', secret).update(`${timestamp}${method}${path}${body}`).digest('hex')
+function getSignature(timestamp: string, nonce: string, method: string, path: string, body: string, secret: string) {
+  return crypto.createHmac('sha256', secret).update(`${timestamp}${nonce}${method}${path}${body}`).digest('hex')
+}
+
+async function giftAccessRequest(path: string, method: 'GET' | 'POST', body: string, apiKey: string, apiSecret: string, extraHeaders: Record<string, string> = {}) {
+  const timestamp = Math.floor(Date.now() / 1000).toString()
+  const nonce = crypto.randomUUID()
+  return fetch(`${GIFT_ACCESS_BASE_URL}${path}`, {
+    method,
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      'X-API-KEY': apiKey,
+      'X-API-TIMESTAMP': timestamp,
+      'X-API-NONCE': nonce,
+      'X-API-SIGNATURE': getSignature(timestamp, nonce, method, path, body, apiSecret),
+      ...extraHeaders,
+    },
+    ...(body ? { body } : {}),
+    cache: 'no-store',
+  })
 }
 
 export async function POST(request: Request) {
@@ -18,6 +37,21 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Gift Access API pa konfigire sou sèvè a.' }, { status: 503 })
   }
 
+  try {
+    const input = (await request.json()) as { action?: string; playerId?: string }
+    if (input.action === 'lookup') {
+      const playerId = input.playerId?.trim() || ''
+      if (!/^\d{6,15}$/.test(playerId)) return NextResponse.json({ error: 'ID Free Fire la pa valab.' }, { status: 400 })
+      const path = `/products/${GIFT_ACCESS_PRODUCT_ID}/player/lookup`
+      const body = JSON.stringify({ userid: playerId, user_id: playerId, player_id: playerId, fields: { userid: playerId, user_id: playerId, player_id: playerId, account_id: playerId, customer_identifier: playerId } })
+      const response = await giftAccessRequest(path, 'POST', body, apiKey, apiSecret)
+      const result = await response.json().catch(() => ({})) as Record<string, unknown>
+      if (!response.ok) return NextResponse.json({ error: 'ID Free Fire la pa jwenn oswa li pa valid.' }, { status: 422 })
+      return NextResponse.json({ verified: true, player: result.player ?? result.data ?? result })
+    }
+  } catch {
+    return NextResponse.json({ error: 'Verifikasyon ID a pa disponib kounye a.' }, { status: 502 })
+  }
   try {
     const input = (await request.json()) as { playerId?: string; reference?: string }
     const playerId = input.playerId?.trim() || ''
@@ -32,19 +66,13 @@ export async function POST(request: Request) {
       product_id: GIFT_ACCESS_PRODUCT_ID,
       quantity: 1,
       reference,
-      fields: { player_id: playerId },
+      userid: playerId,
+      user_id: playerId,
+      player_id: playerId,
+      fields: { userid: playerId, user_id: playerId, player_id: playerId, account_id: playerId, customer_identifier: playerId },
     })
-    const timestamp = Math.floor(Date.now() / 1000).toString()
-    const response = await fetch(`${GIFT_ACCESS_BASE_URL}${path}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-API-KEY': apiKey,
-        'X-API-TIMESTAMP': timestamp,
-        'X-API-SIGNATURE': getSignature(timestamp, 'POST', path, body, apiSecret),
-      },
-      body,
-      cache: 'no-store',
+    const response = await giftAccessRequest(path, 'POST', body, apiKey, apiSecret, {
+      'Idempotency-Key': reference,
     })
 
     const responseText = await response.text()
