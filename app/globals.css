@@ -61,6 +61,7 @@ footer { margin-top: 2rem; padding: 3rem 1rem; border-top: 1px solid var(--line)
 .reference-input { width: 100%; padding: .7rem .75rem; border: 1px solid #334155; border-radius: 8px; outline: none; color: var(--foreground); background: #0b1220; }
 .reference-input:focus { border-color: var(--violet); box-shadow: 0 0 0 3px #8b5cf633; }
   .payment-error { margin: .55rem 0 0; color: #fca5a5; font-size: .75rem; line-height: 1.4; }
+  .payment-amount { margin: .55rem 0 0; color: #fbbf24; font-size: .82rem; font-weight: 700; }
   .payment-success { margin: .55rem 0 0; color: #86efac; font-size: .75rem; line-height: 1.4; }
   .verify-payment { width: 100%; margin-top: .8rem; padding: .75rem; border: 1px solid #6366f1; border-radius: 9px; color: #eef2ff; background: #312e81; font-weight: 800; cursor: pointer; }
   .verify-payment:disabled { opacity: .55; cursor: not-allowed; }
