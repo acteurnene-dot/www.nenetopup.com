@@ -6,8 +6,21 @@ export const runtime = 'nodejs'
 const GIFT_ACCESS_BASE_URL = 'https://portal.gift-access.com/api/v1'
 const GIFT_ACCESS_PRODUCT_ID = '58462'
 
-function getSignature(timestamp: string, method: string, path: string, body: string, secret: string) {
-  return crypto.createHmac('sha256', secret).update(`${timestamp}${method}${path}${body}`).digest('hex')
+function getSignature(timestamp: string, method: string, path: string, body: string, nonce: string, secret: string) {
+  return crypto.createHmac('sha256', secret).update(`${timestamp}${method}${path}${body}${nonce}`).digest('hex')
+}
+
+function findProviderMessage(value: unknown): string | null {
+  if (!value || typeof value !== 'object') return null
+  const record = value as Record<string, unknown>
+  for (const key of ['message', 'error', 'detail', 'description']) {
+    if (typeof record[key] === 'string' && record[key].trim()) return record[key].trim()
+  }
+  for (const key of ['error', 'data', 'result']) {
+    const message = findProviderMessage(record[key])
+    if (message) return message
+  }
+  return null
 }
 
 function findPlayerName(value: unknown): string | null {
@@ -30,6 +43,8 @@ function findPlayerName(value: unknown): string | null {
 
 async function giftAccessRequest(path: string, method: 'GET' | 'POST', body: string, apiKey: string, apiSecret: string, extraHeaders: Record<string, string> = {}) {
   const timestamp = Math.floor(Date.now() / 1000).toString()
+  const nonce = crypto.randomUUID()
+  const signedPath = `/api/v1${path}`
   const controller = new AbortController()
   const timeout = setTimeout(() => controller.abort(), 10000)
   try {
@@ -40,7 +55,8 @@ async function giftAccessRequest(path: string, method: 'GET' | 'POST', body: str
         'Content-Type': 'application/json',
         'X-API-KEY': apiKey,
         'X-API-TIMESTAMP': timestamp,
-        'X-API-SIGNATURE': getSignature(timestamp, method, path, body, apiSecret),
+        'X-API-NONCE': nonce,
+        'X-API-SIGNATURE': getSignature(timestamp, method, signedPath, body, nonce, apiSecret),
         ...extraHeaders,
       },
       ...(body ? { body } : {}),
@@ -66,10 +82,14 @@ export async function POST(request: Request) {
       const playerId = input.playerId?.trim() || ''
       if (!/^\d{6,15}$/.test(playerId)) return NextResponse.json({ error: 'ID Free Fire la pa valab.' }, { status: 400 })
       const path = `/products/${GIFT_ACCESS_PRODUCT_ID}/player/lookup`
-      const body = JSON.stringify({ fields: { userid: playerId } })
+      const body = JSON.stringify({ userid: playerId, user_id: playerId, player_id: playerId, account_id: playerId, customer_identifier: playerId, fields: { userid: playerId, user_id: playerId, player_id: playerId, account_id: playerId, customer_identifier: playerId } })
       const response = await giftAccessRequest(path, 'POST', body, apiKey, apiSecret)
       const result = await response.json().catch(() => ({})) as Record<string, unknown>
-      if (!response.ok) return NextResponse.json({ error: 'ID Free Fire la pa jwenn oswa li pa valid.' }, { status: 422 })
+      if (!response.ok) {
+        const providerMessage = findProviderMessage(result)
+        console.error('[v0] Gift Access UID lookup rejected:', response.status, providerMessage)
+        return NextResponse.json({ error: providerMessage || 'ID Free Fire la pa jwenn oswa li pa valid.' }, { status: 422 })
+      }
       const playerName = findPlayerName(result)
       const account = result.basicInfo && typeof result.basicInfo === 'object' ? result.basicInfo : result.player ?? result.data ?? result
       if (!playerName) return NextResponse.json({ error: 'UID a pa jwenn oswa API a pa retounen non kont lan.' }, { status: 422 })
