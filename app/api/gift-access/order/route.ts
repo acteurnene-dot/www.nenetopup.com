@@ -13,6 +13,11 @@ function getSignature(timestamp: string, method: string, path: string, body: str
 function findPlayerName(value: unknown): string | null {
   if (!value || typeof value !== 'object') return null
   const record = value as Record<string, unknown>
+  const basicInfo = record.basicInfo
+  if (basicInfo && typeof basicInfo === 'object') {
+    const nickname = (basicInfo as Record<string, unknown>).nickname
+    if (typeof nickname === 'string' && nickname.trim()) return nickname.trim()
+  }
   for (const key of ['player_name', 'playerName', 'nickname', 'username', 'ign', 'name']) {
     if (typeof record[key] === 'string' && record[key].trim()) return record[key].trim()
   }
@@ -66,8 +71,9 @@ export async function POST(request: Request) {
       const result = await response.json().catch(() => ({})) as Record<string, unknown>
       if (!response.ok) return NextResponse.json({ error: 'ID Free Fire la pa jwenn oswa li pa valid.' }, { status: 422 })
       const playerName = findPlayerName(result)
-      if (!playerName) return NextResponse.json({ error: 'ID a verifye men API a pa retounen non kont lan.' }, { status: 422 })
-      return NextResponse.json({ verified: true, player: { name: playerName } })
+      const account = result.basicInfo && typeof result.basicInfo === 'object' ? result.basicInfo : result.player ?? result.data ?? result
+      if (!playerName) return NextResponse.json({ error: 'UID a pa jwenn oswa API a pa retounen non kont lan.' }, { status: 422 })
+      return NextResponse.json({ verified: true, player: { name: playerName, account } })
     }
     } catch (error) {
       const message = error instanceof DOMException && error.name === 'AbortError'
