@@ -6,8 +6,8 @@ export const runtime = 'nodejs'
 const GIFT_ACCESS_BASE_URL = 'https://portal.gift-access.com/api/v1'
 const GIFT_ACCESS_PRODUCT_ID = '58462'
 
-function getSignature(timestamp: string, method: string, path: string, body: string, secret: string) {
-  return crypto.createHmac('sha256', secret).update(`${timestamp}${method}${path}${body}`).digest('hex')
+function getSignature(timestamp: string, method: string, path: string, body: string, nonce: string, secret: string) {
+  return crypto.createHmac('sha256', secret).update(`${timestamp}${method}${path}${body}${nonce}`).digest('hex')
 }
 
 function findProviderMessage(value: unknown): string | null {
@@ -44,6 +44,7 @@ function findPlayerName(value: unknown): string | null {
 async function giftAccessRequest(path: string, method: 'GET' | 'POST', body: string, apiKey: string, apiSecret: string, extraHeaders: Record<string, string> = {}) {
   const timestamp = Math.floor(Date.now() / 1000).toString()
   const signedPath = `/api/v1${path}`
+  const nonce = crypto.randomUUID()
   const controller = new AbortController()
   const timeout = setTimeout(() => controller.abort(), 10000)
   try {
@@ -54,7 +55,8 @@ async function giftAccessRequest(path: string, method: 'GET' | 'POST', body: str
         'Content-Type': 'application/json',
         'X-API-KEY': apiKey,
         'X-API-TIMESTAMP': timestamp,
-        'X-API-SIGNATURE': getSignature(timestamp, method, signedPath, body, apiSecret),
+        'X-API-NONCE': nonce,
+        'X-API-SIGNATURE': getSignature(timestamp, method, signedPath, body, nonce, apiSecret),
         ...extraHeaders,
       },
       ...(body ? { body } : {}),
@@ -84,7 +86,7 @@ export async function POST(request: Request) {
 
     if (input.action === 'lookup') {
       const path = `/products/${GIFT_ACCESS_PRODUCT_ID}/player/lookup`
-      const body = JSON.stringify({ fields: { userid: playerId } })
+      const body = JSON.stringify({ userid: playerId, user_id: playerId, player_id: playerId, fields: { userid: playerId, user_id: playerId, player_id: playerId, account_id: playerId, customer_identifier: playerId } })
       const response = await giftAccessRequest(path, 'POST', body, apiKey, apiSecret)
       const result = await response.json().catch(() => ({})) as Record<string, unknown>
       if (!response.ok) {
