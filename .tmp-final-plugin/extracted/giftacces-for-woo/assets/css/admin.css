@@ -1,0 +1,72 @@
+.giftaccess-woo-inline-status {
+	margin-left: 10px;
+	font-weight: 600;
+}
+
+.giftaccess-woo-success {
+	color: #008a20;
+}
+
+.giftaccess-woo-error {
+	color: #b81c23;
+}
+
+.giftaccess-woo-token-list li {
+	margin: 4px 0;
+}
+
+.giftaccess-woo-status {
+	display: inline-block;
+	padding: 2px 8px;
+	border-radius: 2px;
+	font-size: 12px;
+	font-weight: 600;
+	text-transform: uppercase;
+}
+
+.giftaccess-woo-status-success {
+	background: #d4edda;
+	color: #155724;
+}
+
+.giftaccess-woo-status-failed {
+	background: #f8d7da;
+	color: #721c24;
+}
+
+.giftaccess-woo-status-processing {
+	background: #fff3cd;
+	color: #856404;
+}
+
+.giftaccess-woo-order-table code {
+	word-break: break-word;
+}
+
+.giftaccess-woo-customer-item-meta {
+	margin-top: 6px;
+	font-size: 13px;
+}
+
+.giftaccess-woo-tablenav {
+	margin: 12px 0;
+}
+
+.giftaccess-woo-extra-actions {
+	margin-left: 8px;
+}
+
+.giftaccess-woo-admin-table .check-column {
+	width: 2.8em;
+}
+
+.giftaccess-woo-admin-table .check-column input[type="checkbox"] {
+	margin: 0;
+}
+
+.giftaccess-woo-json-cell {
+	display: inline-block;
+	max-width: 560px;
+	white-space: pre-wrap;
+	word-break: break-word;
+}

@@ -10,37 +10,6 @@ function getSignature(timestamp: string, method: string, path: string, body: str
   return crypto.createHmac('sha256', secret).update(`${timestamp}${method}${path}${body}${nonce}`).digest('hex')
 }
 
-function findProviderMessage(value: unknown): string | null {
-  if (!value || typeof value !== 'object') return null
-  const record = value as Record<string, unknown>
-  for (const key of ['message', 'error', 'detail', 'description']) {
-    if (typeof record[key] === 'string' && record[key].trim()) return record[key].trim()
-  }
-  for (const key of ['error', 'data', 'result']) {
-    const message = findProviderMessage(record[key])
-    if (message) return message
-  }
-  return null
-}
-
-function findPlayerName(value: unknown): string | null {
-  if (!value || typeof value !== 'object') return null
-  const record = value as Record<string, unknown>
-  const basicInfo = record.basicInfo
-  if (basicInfo && typeof basicInfo === 'object') {
-    const nickname = (basicInfo as Record<string, unknown>).nickname
-    if (typeof nickname === 'string' && nickname.trim()) return nickname.trim()
-  }
-  for (const key of ['player_name', 'playerName', 'nickname', 'username', 'ign', 'name']) {
-    if (typeof record[key] === 'string' && record[key].trim()) return record[key].trim()
-  }
-  for (const key of ['player', 'profile', 'lookup', 'result', 'data', 'account']) {
-    const name = findPlayerName(record[key])
-    if (name) return name
-  }
-  return null
-}
-
 async function giftAccessRequest(path: string, method: 'GET' | 'POST', body: string, apiKey: string, apiSecret: string, extraHeaders: Record<string, string> = {}) {
   const timestamp = Math.floor(Date.now() / 1000).toString()
   const signedPath = `/api/v1${path}`
@@ -82,21 +51,6 @@ export async function POST(request: Request) {
 
     if (!/^\d{6,15}$/.test(playerId)) {
       return NextResponse.json({ error: 'ID Free Fire la pa valab.' }, { status: 400 })
-    }
-
-    if (input.action === 'lookup') {
-      const path = `/products/${GIFT_ACCESS_PRODUCT_ID}/player/lookup`
-      const body = JSON.stringify({ userid: playerId, user_id: playerId, player_id: playerId, fields: { userid: playerId, user_id: playerId, player_id: playerId, account_id: playerId, customer_identifier: playerId } })
-      const response = await giftAccessRequest(path, 'POST', body, apiKey, apiSecret)
-      const result = await response.json().catch(() => ({})) as Record<string, unknown>
-      if (!response.ok) {
-        const providerMessage = findProviderMessage(result)
-        return NextResponse.json({ error: providerMessage || 'ID Free Fire la pa jwenn oswa li pa valid.' }, { status: 422 })
-      }
-      const playerName = findPlayerName(result)
-      const account = result.basicInfo && typeof result.basicInfo === 'object' ? result.basicInfo : result.player ?? result.data ?? result
-      if (!playerName) return NextResponse.json({ error: 'API a pa retounen non kont Free Fire la.' }, { status: 422 })
-      return NextResponse.json({ verified: true, player: { name: playerName, account } })
     }
 
     const reference = input.reference?.trim() || `NENE-${crypto.randomUUID()}`
