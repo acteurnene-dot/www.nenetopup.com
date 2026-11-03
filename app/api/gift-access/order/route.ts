@@ -6,8 +6,8 @@ export const runtime = 'nodejs'
 const GIFT_ACCESS_BASE_URL = 'https://portal.gift-access.com/api/v1'
 const GIFT_ACCESS_PRODUCT_ID = '58462'
 
-function getSignature(timestamp: string, method: string, path: string, body: string, nonce: string, secret: string) {
-  return crypto.createHmac('sha256', secret).update(`${timestamp}${method}${path}${body}${nonce}`).digest('hex')
+function getSignature(timestamp: string, method: string, path: string, body: string, secret: string) {
+  return crypto.createHmac('sha256', secret).update(`${timestamp}${method}${path}${body}`).digest('hex')
 }
 
 function findProviderMessage(value: unknown): string | null {
@@ -43,7 +43,6 @@ function findPlayerName(value: unknown): string | null {
 
 async function giftAccessRequest(path: string, method: 'GET' | 'POST', body: string, apiKey: string, apiSecret: string, extraHeaders: Record<string, string> = {}) {
   const timestamp = Math.floor(Date.now() / 1000).toString()
-  const nonce = crypto.randomUUID()
   const signedPath = `/api/v1${path}`
   const controller = new AbortController()
   const timeout = setTimeout(() => controller.abort(), 10000)
@@ -55,8 +54,7 @@ async function giftAccessRequest(path: string, method: 'GET' | 'POST', body: str
         'Content-Type': 'application/json',
         'X-API-KEY': apiKey,
         'X-API-TIMESTAMP': timestamp,
-        'X-API-NONCE': nonce,
-        'X-API-SIGNATURE': getSignature(timestamp, method, signedPath, body, nonce, apiSecret),
+        'X-API-SIGNATURE': getSignature(timestamp, method, signedPath, body, apiSecret),
         ...extraHeaders,
       },
       ...(body ? { body } : {}),
@@ -69,8 +67,8 @@ async function giftAccessRequest(path: string, method: 'GET' | 'POST', body: str
 }
 
 export async function POST(request: Request) {
-  const apiKey = process.env.Secret_2
-  const apiSecret = process.env.Secret_3
+  const apiKey = process.env.API_KEY
+  const apiSecret = process.env.Secret
 
   if (!apiKey || !apiSecret) {
     return NextResponse.json({ error: 'Gift Access API pa konfigire sou sèvè a.' }, { status: 503 })
