@@ -1,0 +1,641 @@
+.giftaccess-topup-admin {
+    color: #172033;
+    max-width: 1280px;
+}
+
+.giftaccess-topup-admin * {
+    box-sizing: border-box;
+}
+
+.giftaccess-topup-titlebar {
+    align-items: center;
+    background: #ffffff;
+    border: 1px solid #dbe3ef;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    margin: 20px 0 14px;
+    padding: 18px 20px;
+}
+
+.giftaccess-topup-titlebar h1 {
+    color: #172033;
+    font-size: 24px;
+    line-height: 1.25;
+    margin: 0;
+}
+
+.giftaccess-topup-titlebar p {
+    color: #64748b;
+    font-size: 13px;
+    line-height: 1.5;
+    margin: 5px 0 0;
+}
+
+.giftaccess-topup-hero {
+    align-items: flex-end;
+    background: #101827;
+    border: 1px solid #26364f;
+    border-radius: 8px;
+    color: #ffffff;
+    display: flex;
+    gap: 24px;
+    justify-content: space-between;
+    margin: 20px 0 16px;
+    padding: 24px;
+}
+
+.giftaccess-topup-hero h1 {
+    color: #ffffff;
+    font-size: 28px;
+    line-height: 1.2;
+    margin: 6px 0 8px;
+}
+
+.giftaccess-topup-hero p {
+    color: #c9d4e7;
+    font-size: 14px;
+    line-height: 1.6;
+    margin: 0;
+    max-width: 680px;
+}
+
+.giftaccess-topup-eyebrow {
+    color: #72d7ef;
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.8px;
+    text-transform: uppercase;
+}
+
+.giftaccess-topup-hero-actions {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.giftaccess-topup-action {
+    display: inline-flex;
+    margin: 0;
+}
+
+.giftaccess-topup-secondary-action {
+    align-items: center;
+    display: inline-flex !important;
+}
+
+.giftaccess-topup-stats {
+    display: grid;
+    gap: 12px;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    margin-bottom: 16px;
+}
+
+.giftaccess-topup-stat {
+    background: #ffffff;
+    border: 1px solid #dbe3ef;
+    border-left: 4px solid #8091a8;
+    border-radius: 8px;
+    box-shadow: 0 8px 20px rgba(16, 24, 39, 0.04);
+    min-width: 0;
+    padding: 16px;
+}
+
+.giftaccess-topup-stat-good {
+    border-left-color: #16a34a;
+}
+
+.giftaccess-topup-stat-warn {
+    border-left-color: #d99a24;
+}
+
+.giftaccess-topup-stat-neutral {
+    border-left-color: #2f80ed;
+}
+
+.giftaccess-topup-stat-label,
+.giftaccess-topup-stat-hint,
+.giftaccess-topup-muted {
+    color: #64748b;
+    display: block;
+    font-size: 12px;
+}
+
+.giftaccess-topup-stat strong {
+    color: #172033;
+    display: block;
+    font-size: 22px;
+    line-height: 1.25;
+    margin: 4px 0;
+    overflow-wrap: anywhere;
+}
+
+.giftaccess-topup-tabs {
+    align-items: center;
+    display: flex;
+    gap: 8px;
+    margin: 4px 0 18px;
+}
+
+.giftaccess-topup-tabs a {
+    align-items: center;
+    background: #ffffff;
+    border: 1px solid #dbe3ef;
+    border-radius: 8px;
+    color: #334155;
+    display: inline-flex;
+    gap: 8px;
+    min-height: 42px;
+    padding: 0 14px;
+    text-decoration: none;
+}
+
+.giftaccess-topup-tabs a:hover,
+.giftaccess-topup-tabs a:focus {
+    border-color: #2f80ed;
+    color: #0f5bb5;
+}
+
+.giftaccess-topup-tabs a.is-active {
+    background: #eaf4ff;
+    border-color: #2f80ed;
+    color: #0f5bb5;
+    font-weight: 700;
+}
+
+.giftaccess-topup-page {
+    margin-bottom: 40px;
+}
+
+.giftaccess-topup-grid {
+    display: grid;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.giftaccess-topup-grid-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.giftaccess-topup-panel {
+    background: #ffffff;
+    border: 1px solid #dbe3ef;
+    border-radius: 8px;
+    box-shadow: 0 10px 24px rgba(16, 24, 39, 0.05);
+    overflow: hidden;
+}
+
+.giftaccess-topup-panel-header {
+    align-items: flex-start;
+    border-bottom: 1px solid #edf2f7;
+    display: flex;
+    gap: 12px;
+    padding: 18px 20px;
+}
+
+.giftaccess-topup-panel-header .dashicons {
+    align-items: center;
+    background: #eaf4ff;
+    border-radius: 8px;
+    color: #0f5bb5;
+    display: inline-flex;
+    flex: 0 0 36px;
+    height: 36px;
+    justify-content: center;
+    width: 36px;
+}
+
+.giftaccess-topup-panel-header h2,
+.giftaccess-topup-toolbar h2 {
+    color: #172033;
+    font-size: 18px;
+    line-height: 1.3;
+    margin: 0;
+}
+
+.giftaccess-topup-panel-header p,
+.giftaccess-topup-toolbar p,
+.giftaccess-topup-empty p,
+.giftaccess-topup-help {
+    color: #64748b;
+    font-size: 13px;
+    line-height: 1.55;
+    margin: 4px 0 0;
+}
+
+.giftaccess-topup-panel-body {
+    padding: 18px 20px 20px;
+}
+
+.giftaccess-topup-form-table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.giftaccess-topup-field-row th,
+.giftaccess-topup-field-row td {
+    display: block;
+    padding: 0 0 14px;
+    width: 100%;
+}
+
+.giftaccess-topup-field-row th {
+    color: #334155;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.giftaccess-topup-switch-row {
+    align-items: center;
+    border-bottom: 1px solid #edf2f7;
+    display: flex;
+    gap: 16px;
+    justify-content: space-between;
+    padding: 12px 0;
+}
+
+.giftaccess-topup-switch-row:last-child {
+    border-bottom: 0;
+}
+
+.giftaccess-topup-switch-row th,
+.giftaccess-topup-switch-row td {
+    display: block;
+    padding: 0;
+    width: auto;
+}
+
+.giftaccess-topup-switch-row th {
+    color: #0f172a;
+    flex: 1 1 auto;
+    line-height: 1.35;
+    min-width: 0;
+    text-align: left;
+}
+
+.giftaccess-topup-switch-row td {
+    flex: 0 0 auto;
+}
+
+.giftaccess-topup-input,
+.giftaccess-topup-copyline input,
+.giftaccess-topup-inline-form input.regular-text {
+    border: 1px solid #cfd8e6;
+    border-radius: 8px;
+    min-height: 42px;
+    width: 100%;
+}
+
+.giftaccess-topup-input:focus,
+.giftaccess-topup-copyline input:focus,
+.giftaccess-topup-inline-form input.regular-text:focus {
+    border-color: #2f80ed;
+    box-shadow: 0 0 0 3px rgba(47, 128, 237, 0.16);
+}
+
+.giftaccess-topup-switch {
+    align-items: center;
+    display: inline-flex;
+    gap: 10px;
+    white-space: nowrap;
+}
+
+.giftaccess-topup-switch input {
+    height: 1px;
+    opacity: 0;
+    position: absolute;
+    width: 1px;
+}
+
+.giftaccess-topup-switch-ui {
+    background: #cbd5e1;
+    border-radius: 999px;
+    display: inline-block;
+    height: 24px;
+    position: relative;
+    transition: background 0.18s ease;
+    width: 46px;
+}
+
+.giftaccess-topup-switch-ui:after {
+    background: #ffffff;
+    border-radius: 50%;
+    box-shadow: 0 2px 5px rgba(15, 23, 42, 0.22);
+    content: "";
+    height: 18px;
+    left: 3px;
+    position: absolute;
+    top: 3px;
+    transition: transform 0.18s ease;
+    width: 18px;
+}
+
+.giftaccess-topup-switch input:checked + .giftaccess-topup-switch-ui {
+    background: #16a34a;
+}
+
+.giftaccess-topup-switch input:checked + .giftaccess-topup-switch-ui:after {
+    transform: translateX(22px);
+}
+
+.giftaccess-topup-switch-label {
+    color: #334155;
+    font-weight: 600;
+}
+
+.giftaccess-topup-copyline {
+    display: grid;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.giftaccess-topup-copyline span {
+    color: #64748b;
+    font-size: 12px;
+}
+
+.giftaccess-topup-setup-note {
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    padding: 14px;
+}
+
+.giftaccess-topup-setup-note strong {
+    color: #1e40af;
+    display: block;
+    font-size: 14px;
+}
+
+.giftaccess-topup-setup-note p {
+    color: #334155;
+    margin: 5px 0 0;
+}
+
+.giftaccess-topup-submit-bar {
+    align-items: center;
+    background: #ffffff;
+    border: 1px solid #dbe3ef;
+    border-radius: 8px;
+    display: flex;
+    justify-content: flex-end;
+    padding: 14px 16px;
+}
+
+.giftaccess-topup-toolbar {
+    align-items: center;
+    background: #ffffff;
+    border: 1px solid #dbe3ef;
+    border-radius: 8px;
+    display: flex;
+    gap: 18px;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    padding: 18px 20px;
+}
+
+.giftaccess-topup-inline-form {
+    align-items: center;
+    display: grid;
+    gap: 10px;
+    grid-template-columns: minmax(220px, 1fr) auto;
+}
+
+.giftaccess-topup-table-wrap {
+    overflow-x: auto;
+}
+
+.giftaccess-topup-table {
+    border: 0;
+    min-width: 760px;
+}
+
+.giftaccess-topup-table th {
+    color: #64748b;
+    font-size: 12px;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+}
+
+.giftaccess-topup-table td,
+.giftaccess-topup-table th {
+    padding: 14px 12px;
+    vertical-align: middle;
+}
+
+.giftaccess-topup-actions-col {
+    width: 150px;
+}
+
+.giftaccess-topup-badge,
+.giftaccess-topup-level {
+    align-items: center;
+    border-radius: 999px;
+    display: inline-flex;
+    font-size: 11px;
+    font-weight: 700;
+    min-height: 24px;
+    padding: 0 10px;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.giftaccess-topup-badge {
+    background: #eaf4ff;
+    color: #0f5bb5;
+}
+
+.giftaccess-topup-woolink {
+    font-weight: 700;
+    margin-left: 8px;
+    text-decoration: none;
+}
+
+.giftaccess-topup-status-imported {
+    align-items: center;
+    background: #dcfce7;
+    border: 1px solid #86efac;
+    border-radius: 999px;
+    color: #166534;
+    display: inline-flex;
+    font-size: 11px;
+    font-weight: 800;
+    min-height: 24px;
+    padding: 0 10px;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.giftaccess-topup-empty {
+    align-items: center;
+    border: 1px dashed #cbd5e1;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 180px;
+    padding: 28px;
+    text-align: center;
+}
+
+.giftaccess-topup-empty .dashicons {
+    color: #2f80ed;
+    font-size: 36px;
+    height: 36px;
+    width: 36px;
+}
+
+.giftaccess-topup-empty h3 {
+    color: #172033;
+    font-size: 17px;
+    margin: 12px 0 2px;
+}
+
+.giftaccess-topup-log-counts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.giftaccess-topup-level-error {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.giftaccess-topup-level-warning {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.giftaccess-topup-level-info {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.giftaccess-topup-level-debug {
+    background: #ede9fe;
+    color: #5b21b6;
+}
+
+.giftaccess-topup-log-table pre {
+    background: #0f172a;
+    border-radius: 8px;
+    color: #dbeafe;
+    margin: 0;
+    max-height: 220px;
+    max-width: 560px;
+    overflow: auto;
+    padding: 12px;
+    white-space: pre-wrap;
+}
+
+.giftaccess-topup-log-table td:nth-child(3) {
+    width: 100%;
+}
+
+.giftaccess-topup-log-table td:nth-child(4),
+.giftaccess-topup-log-table th:nth-child(4) {
+    text-align: right;
+}
+
+.giftaccess-topup-log-detail-grid {
+    display: grid;
+    gap: 12px;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.giftaccess-topup-detail-item {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    min-width: 0;
+    padding: 14px;
+}
+
+.giftaccess-topup-detail-item span {
+    color: #64748b;
+    display: block;
+    font-size: 12px;
+    margin-bottom: 6px;
+}
+
+.giftaccess-topup-detail-item strong {
+    color: #172033;
+    display: inline-flex;
+    font-size: 14px;
+    line-height: 1.4;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+}
+
+.giftaccess-topup-context-view {
+    background: #0f172a;
+    border-radius: 8px;
+    color: #dbeafe;
+    margin: 0;
+    max-height: 620px;
+    overflow: auto;
+    padding: 18px;
+    white-space: pre-wrap;
+}
+
+.giftaccess-topup-nowrap {
+    white-space: nowrap;
+}
+
+@media (max-width: 960px) {
+    .giftaccess-topup-hero,
+    .giftaccess-topup-toolbar {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .giftaccess-topup-hero-actions {
+        justify-content: flex-start;
+    }
+
+    .giftaccess-topup-stats,
+    .giftaccess-topup-grid-2,
+    .giftaccess-topup-log-detail-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 640px) {
+    .giftaccess-topup-hero {
+        padding: 18px;
+    }
+
+    .giftaccess-topup-hero h1 {
+        font-size: 23px;
+    }
+
+    .giftaccess-topup-stats,
+    .giftaccess-topup-grid-2,
+    .giftaccess-topup-inline-form,
+    .giftaccess-topup-log-detail-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .giftaccess-topup-tabs {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .giftaccess-topup-tabs a,
+    .giftaccess-topup-inline-form .button {
+        justify-content: center;
+        width: 100%;
+    }
+
+    .giftaccess-topup-switch-row {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 10px;
+    }
+}
